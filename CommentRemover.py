@@ -1,6 +1,6 @@
 """
 	Removes all comments under a given threshold after replying to them.
-	
+
 	Fix requested by /u/Dark_Saint.
 	https://www.reddit.com/r/RequestABot/comments/54sd3i/fix_comment_bot/
 	https://www.reddit.com/r/redditdev/comments/54syiw/question_deleted_comments/
@@ -24,6 +24,8 @@ TIME_BETWEEN_RUNS = 30		# In number of seconds, the minimum is 30 seconds
 #
 r = praw.Reddit('Python:DownvotedCommentRemover run by {}'.format(USERNAME))
 o = OAuth2Util.OAuth2Util(r)
+o.refresh(force=True)
+
 print("Grabbing subreddit...")
 subreddit = r.get_subreddit(SUBREDDIT)
 
@@ -41,6 +43,5 @@ def run_bot(r):
 	print("End bot run")
 
 while True:
-	o.refresh()
 	run_bot(subreddit)
 	time.sleep(max(30, TIME_BETWEEN_RUNS))
