@@ -43,15 +43,11 @@ r = praw.Reddit('Python:StatisticsAggregate by /u/BitwiseShift, run by {}'.forma
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
 
-# Handle Reddit's awful timestamps, using local instead of epoch timestamps. I'm also assuming they
-# are following the sf dst as well *sigh*.
-reddit_tz = pytz.timezone("America/Los_Angeles")						# The local timezone reddit insists on working in.
-# Get Reddit's local timestamp.
-t_to = reddit_tz.normalize(pytz.utc.localize(datetime.utcnow()).replace(tzinfo=reddit_tz))
-t_from = reddit_tz.normalize(t_to - timedelta(days=DAYS_TO_GO_BACK))	# Go back x days and deal with dst transitions.
+t_to = int(time()) +8*60*60				# After trying to get timezones and dst to work, I give up, I've stopped caring.
+t_from = t_to - 24*60*60DAYS_TO_GO_BACK
 
 print("Retrieving submissions...")
-search_string = "(and timestamp:{}..{} flair:'{}')".format(int(t_from.timestamp()), int(t_to.timestamp()), FLAIR)
+search_string = "(and timestamp:{}..{} flair:'{}')".format(int(t_from.timestamp()), int(t_to.replace(tzinfo=pytz.utc).timestamp()), FLAIR)
 submissions = r.search(search_string, subreddit=SUBREDDIT, sort="new", limit=LIMIT, syntax="cloudsearch")
 
 print("Gathering additional submission statistics:")
@@ -68,7 +64,7 @@ for submission in submissions:
 	stats["total"] += submission.ups + downs
 	stats["up_percent"] += submission.upvote_ratio
 	# Thankfully, they do have a epoch timestamp on submission creation dates.
-	t = datetime.fromtimestamp(submission.created_utc, tz=pytz.utc).astimezone(tz=None).strftime("%x %X")
+	t = datetime.utcfromtimestamp(submission.created_utc).strftime("%x %X")
 	print("... {:4}  date: {} | up%: {:3d}% | ups: {:4} | downs: {:4} | total: {:4} | id: {}".format(
 	i, t, int(submission.upvote_ratio*100), submission.ups, downs, submission.ups + downs, submission.id))
 print("Done!\n")
