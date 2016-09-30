@@ -42,6 +42,7 @@ USERNAME = "BitwiseShift"
 SUBREDDIT = "BitwiseShiftTest"			# Subreddit name, without the /r/ part.
 TIME_BETWEEN_RUNS = 35					# In number of seconds, the minimum is 35 seconds
 
+
 #
 # Actual bot
 #
@@ -50,17 +51,13 @@ TRANSLATION_URL = "https://translate.google.com/translate?sl={lang_from}&tl={lan
 COMMENT_REGEX = re.compile("'<!--.*-->")
 print("Authenticating...")
 r = praw.Reddit('Python:SubmissionTranslator by /u/BitwiseShift, run by {}'.format(USERNAME))
+from pprint import pprint
+r.config.permalink_url = "http://www.reddit.com/"		# debug
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
 
 t_from = None
-t_to = int(time()) + 8*60*60
-
-
-post = next(r.get_subreddit(SUBREDDIT).get_new(limit=None))
-print(post.created)
-print(post.created_utc)
-print(post.id)
+t_to = int(time()) + 8*60*60 - 1		# -1 will be undone in iteration.
 
 
 def visible(element):
@@ -77,9 +74,8 @@ def run_bot():
 	t_from = t_to + 1
 	t_to = int(time()) + 8*60*60
 	search_string = "timestamp:{}..{}".format(t_from, t_to)
-	print(search_string)
 	print("Retrieving new submissions...")
-	submissions = r.search(search_string, subreddit=SUBREDDIT, limit=None, syntax="cloudsearch")
+	submissions = r.search(search_string, subreddit=SUBREDDIT, sort="New", limit=1000, syntax="cloudsearch")
 	for submission in submissions:
 		print("+ New submission: ID={}".format(submission.id))
 		if submission.is_self:
@@ -98,7 +94,7 @@ def run_bot():
 			soup = BeautifulSoup(html, 'html.parser')
 			texts = soup.findAll(text=True)
 			visible_texts = filter(visible, texts)
-			text = "\n\n".join(visible_text)
+			text = "\n\n".join(visible_texts)
 		print("... Detecting language")
 		text_lang = langdetect.detect(text)
 		
@@ -110,6 +106,7 @@ def run_bot():
 				replies.append(("[{lang_reply}]("+TRANSLATION_URL+").").format(lang_reply=lang_reply, lang_from=text_lang, lang_to=lang, url=urllib.parse.quote(submission.url)))
 		reply_body = "\n\n".join(replies)
 		submission.add_comment(reply_body)
+
 
 while True:
 	print("Waiting {} seconds for incoming submissions.".format(TIME_BETWEEN_RUNS))
