@@ -10,16 +10,19 @@
 	but may also give only 1 upvote. It is impossible to get 71% upvote_ratio with 1 upvote. So the
 	upvote count is likely behind, because 71% can be reached with 5 upvotes and 2 downvotes. Don't
 	run this bot perpetually, as it makes way too many requests for little amounts of data.
+	
+	Since Reddit doesn't follow industry standards and uses local time instead of epoch timestamps,
+	you'll need to install pytz, which deals with converting time between timezones and dst.
+	to do this, run "pip install pytz" in the command line.
 
 	Requested by /u/Ace_InTheSleeve.
 	https://www.reddit.com/r/RequestABot/comments/54t6f3/bot_that_aggregates_upvote_percentage_of_threads/
 """
 import praw
 import OAuth2Util
-import time
 from datetime import datetime, timedelta
-# Needed to deal with the clusterfuck that is timezones, since Reddit doesn't use epoch timezone, but SF timezone instead.
-# I don't even want to know what they are doing when dst is applied.
+# Needed to deal with the clusterfuck that is timezones, since Reddit doesn't use epoch timezone,
+# but SF timezone instead. I don't even want to know what they are doing when dst is applied.
 import pytz
 
 
@@ -27,10 +30,10 @@ import pytz
 # Configuration
 #
 USERNAME = "BitwiseShift"
-SUBREDDIT = "BuildAPC"
+SUBREDDIT = "BuildAPC"		# Subreddit name, without the /r/ part.
 FLAIR = "Build upgrade"
-LIMIT = 1000			# The amount of submissions to load. Using None automatically loads as many as allowed.
-DAYS_TO_GO_BACK = 7		# The end date will likely not be reached for active subs due to the request limit.
+LIMIT = 10					# The amount of submissions to load. Using None automatically loads as many as allowed.
+DAYS_TO_GO_BACK = 7			# The end date will likely not be reached for active subs due to the request limit.
 
 #
 # Actual bot
@@ -43,11 +46,12 @@ o.refresh(force=True)
 # Handle Reddit's awful timestamps, using local instead of epoch timestamps. I'm also assuming they
 # are following the sf dst as well *sigh*.
 reddit_tz = pytz.timezone("America/Los_Angeles")						# The local timezone reddit insists on working in.
-t_to = datetime.now(tz=pytz.utc).replace(tzinfo=reddit_tz)				# Get Reddit's local timestamp.
+# Get Reddit's local timestamp.
+t_to = reddit_tz.normalize(pytz.utc.localize(datetime.utcnow()).replace(tzinfo=reddit_tz))
 t_from = reddit_tz.normalize(t_to - timedelta(days=DAYS_TO_GO_BACK))	# Go back x days and deal with dst transitions.
 
 print("Retrieving submissions...")
-search_string = "(and timestamp:{}..{} flair:'{}')".format(int((t_from).timestamp()), int((t_to).timestamp()), FLAIR)
+search_string = "(and timestamp:{}..{} flair:'{}')".format(int(t_from.timestamp()), int(t_to.timestamp()), FLAIR)
 submissions = r.search(search_string, subreddit=SUBREDDIT, sort="new", limit=LIMIT, syntax="cloudsearch")
 
 print("Gathering additional submission statistics:")

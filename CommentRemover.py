@@ -7,13 +7,13 @@
 """
 import praw
 import OAuth2Util
-import time
+from time import sleep
 
 #
 # Configuration
 #
 USERNAME = "BitwiseShift"
-SUBREDDIT = "BitwiseShiftTest"
+SUBREDDIT = "BitwiseShiftTest"		# Subreddit name, without the /r/ part.
 # Reply given to deleted comments. Set to an empty string '' to not reply at all.
 REMOVE_MESSAGE = "Wow, your score is low!"
 THRESHOLD = -2
@@ -29,7 +29,7 @@ o.refresh(force=True)
 print("Grabbing subreddit...")
 subreddit = r.get_subreddit(SUBREDDIT)
 
-def run_bot(r):
+def run_bot():
 	print("Start bot run")
 	print("Grabbing comments...")
 	comments = list(subreddit.get_comments(limit=100))
@@ -43,5 +43,5 @@ def run_bot(r):
 	print("End bot run")
 
 while True:
-	run_bot(subreddit)
-	time.sleep(max(30, TIME_BETWEEN_RUNS))
+	run_bot()
+	sleep(max(30, TIME_BETWEEN_RUNS))
