@@ -1,10 +1,15 @@
 """
-	This will translate all submissions posted while the bot is running to other languages. It does
-	not use Google's autodetection to determine the language of the document, as you'd need an API
-	key for that, which is to difficult for laymen and isn't free. It does use Google translate
-	through a the Google translate page translator instead of the translate API.
+	This bot can be summoned to translate a submission. It does not use Google's autodetection to
+	determine the language of the document, as you'd need an API key for that, which is to difficult
+	for laymen and isn't free. It does use Google translate through a the Google translate page
+	translator instead of the translate API.
 	
 	Uses the langdetect module to detect language. Install it with 'pip install langdetect'.
+	Uses the iso-639 module to detect know what language code corresponds to which language. Install
+	it with 'pip install iso-639'.
+	
+	Additional features to check for top level comments and multiple replies in the same thread may
+	be necessary.
 	
 	Requested by /u/frost_biten.
 	https://www.reddit.com/r/RequestABot/comments/555gew/a_translation_bot_for_rhabs/
@@ -22,43 +27,89 @@ import OAuth2Util
 from bs4 import BeautifulSoup
 import re
 import langdetect
+from iso639 import languages
+from time import sleep
 import socket
 socket.setdefaulttimeout(10)		# Don't linger too long on pages that don't load
-from time import sleep, time
 
 
 #
 # Configuration
 #
 
-# Make sure Google translate supports you languages and enter its ISO 639-1 code.
+# Make sure Google translate supports your languages and enter its ISO 639-1 code.
 # See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 # On the right is the text to display for the translated language, on the left is its ISO 639-1 code.
-TRANSLATE_TO = {
-	"fr": "Version Française",
-	"en": "English version",
-}
+DEFAULT_TRANSLATIONS = ["fr", "en"]
 USERNAME = "BitwiseShift"
-SUBREDDIT = "BitwiseShiftTest"			# Subreddit name, without the /r/ part.
-TIME_BETWEEN_RUNS = 35					# In number of seconds, the minimum is 35 seconds
-
+TIME_BETWEEN_RUNS = 35		# The minimum time between runs is 35.
+# The comment needed to summon the translator. The default syntax given will summon the bot
+# "+/u/YOUR_USERNAME!". The {} in the below string gets replace by your username.
+SUMMON_SYNTAX = "+/u/{}!".format(USERNAME)
+# Setting this to True allows you to override the DEFAULT_TRANSLATIONS by adding a list of 2-letter
+# language codes to the summon, e.g. "+/u/YOUR_USERNAME! en de" will translate to German and English
+# instead of to the default translations. It will only work if the summon is followed by only the
+# list of two letter codes. If what follows isn't that list, it will be ignored, e.g. if followed by
+# a comment ""+/u/YOUR_USERNAME! I love this bot!" will translate to the defaults.
+ALLOW_LANGUAGE_OVERRIDE = True
+#  by putting them in this list. If the list is empty, it will repond to mentions originating from
+# This bot does not run in a specific subreddit, you can limit in which subreddits this bot will act
+# all subreddits.
+ALLOWED_SUBREDDITS = ["BitwiseShiftTest", "Test", ]		# Without the /r/ part.
 
 #
 # Actual bot
 #
 
+# Change some of the config to be more usable.
+# Store the language codes with their full name.
+DEFAULT_TRANSLATIONS = {lang_code: languages.get(part1=lang_code).name for lang_code in DEFAULT_TRANSLATIONS}
+# Convert all subreddits to lowercase.
+ALLOWED_SUBREDDITS = [sr.lower() for sr in ALLOWED_SUBREDDITS]
+
 TRANSLATION_URL = "https://translate.google.com/translate?sl={lang_from}&tl={lang_to}&u={url}"
-COMMENT_REGEX = re.compile("'<!--.*-->")
+COMMENT_REGEX = re.compile("<!--.*-->")
+
 print("Authenticating...")
 r = praw.Reddit('Python:SubmissionTranslator by /u/BitwiseShift, run by {}'.format(USERNAME))
-from pprint import pprint
-r.config.permalink_url = "http://www.reddit.com/"		# debug
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
+before = None
 
-t_from = None
-t_to = int(time()) + 8*60*60 - 1		# -1 will be undone in iteration.
 
+def get_lang_codes(body):
+	lang_codes = body[len(SUMMON_SYNTAX):].split()
+	all_two = len(lang_codes) and all([len(code) == 2 for code in lang_codes])
+	return set(lang_codes) if all_two else set()
+
+
+def parse_mention(mention):
+	""" Parse the summon. Check validity and generate translations list. """
+	ret = {"is_valid": mention.body.startswith(SUMMON_SYNTAX)}
+	if not ret["is_valid"]:
+		return ret
+	ret["is_allowed"] = mention.subreddit.display_name.lower() in ALLOWED_SUBREDDITS or not ALLOWED_SUBREDDITS
+	if not ret["is_allowed"]:
+		return ret
+	
+	# Look for existing comments from the bot.
+	comments = list(mention.replies)
+	ret["commented_before"] = any(comment.author.name.lower() == r.user.name.lower() for comment in comments)
+
+	poss_lang_codes = get_lang_codes(mention.body)
+	if poss_lang_codes:
+		ret["translate_to"] = {}
+		for code in poss_lang_codes:
+			try:
+				ret["translate_to"][code] = languages.get(part1=code).name
+			except KeyError:
+				pass
+	else:
+		ret["translate_to"] = DEFAULT_TRANSLATIONS
+	
+	pprint(ret["translate_to"])
+	return ret
+	
 
 def visible(element):
 	# https://stackoverflow.com/questions/1936466/beautifulsoup-grab-visible-webpage-text
@@ -70,14 +121,29 @@ def visible(element):
 
 	
 def run_bot():
-	global t_to
-	t_from = t_to + 1
-	t_to = int(time()) + 8*60*60
-	search_string = "timestamp:{}..{}".format(t_from, t_to)
-	print("Retrieving new submissions...")
-	submissions = r.search(search_string, subreddit=SUBREDDIT, sort="New", limit=1000, syntax="cloudsearch")
-	for submission in submissions:
-		print("+ New submission: ID={}".format(submission.id))
+	global before
+	first = True
+	
+	mentions = r.get_mentions(sort="New", params={"before": before})	
+	for mention in mentions:
+		if first:				# Update the 'before'.
+			first = False
+			before = mention.name
+		
+		print("+ New mention: ID={}".format(mention.id))
+		print("... From: "+mention.permalink)
+		info = parse_mention(mention)
+		
+		if not info["is_valid"]:
+			print("... Invalid summon.")
+			continue
+		if not info["is_allowed"]:
+			print("... I'm not allowed to go into that subreddit!")
+			continue
+		if info["commented_before"]:
+			print("... I've replied to this mention before! Ignoring.")
+			continue
+		submission = mention.submission
 		if submission.is_self:
 			pass
 			print("... Text submission, using selftext")
@@ -87,7 +153,7 @@ def run_bot():
 			try:
 				f = urllib.request.urlopen(submission.url)
 			except:
-				print("... Something went wring while getting the url, skipping.")
+				print("... Something went wrong while getting the url, skipping.")
 				continue
 			html = f.read().decode()
 			# Get all visible text in the document, to detect the language.
@@ -101,14 +167,17 @@ def run_bot():
 		print("... Posting translations")
 		# Generate reply text for each translation language.
 		replies = []
-		for lang, lang_reply in TRANSLATE_TO.items():
+		
+		for lang, lang_reply in info["translate_to"].items():
 			if lang != text_lang:
-				replies.append(("[{lang_reply}]("+TRANSLATION_URL+").").format(lang_reply=lang_reply, lang_from=text_lang, lang_to=lang, url=urllib.parse.quote(submission.url)))
+				replies.append(("[{lang_reply} version]("+TRANSLATION_URL+").").format(lang_reply=lang_reply, lang_from=text_lang, lang_to=lang, url=urllib.parse.quote(submission.url)))
 		reply_body = "\n\n".join(replies)
-		submission.add_comment(reply_body)
+		mention.reply(reply_body)
+		
 
-
+print("Starting bot.")
 while True:
-	print("Waiting {} seconds for incoming submissions.".format(TIME_BETWEEN_RUNS))
-	sleep(max(35,TIME_BETWEEN_RUNS))
+	print("Checking new mentions.")
 	run_bot()
+	print("Waiting {} seconds to recheck mentions.".format(TIME_BETWEEN_RUNS))
+	sleep(max(35, TIME_BETWEEN_RUNS))
