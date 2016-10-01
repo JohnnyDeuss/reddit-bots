@@ -21,6 +21,7 @@
 import praw
 import OAuth2Util
 from datetime import datetime, timedelta
+from time import time
 # Needed to deal with the clusterfuck that is timezones, since Reddit doesn't use epoch timezone,
 # but SF timezone instead. I don't even want to know what they are doing when dst is applied.
 import pytz
@@ -44,10 +45,10 @@ o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
 
 t_to = int(time()) +8*60*60				# After trying to get timezones and dst to work, I give up, I've stopped caring.
-t_from = t_to - 24*60*60DAYS_TO_GO_BACK
+t_from = t_to - 24*60*60*DAYS_TO_GO_BACK
 
 print("Retrieving submissions...")
-search_string = "(and timestamp:{}..{} flair:'{}')".format(int(t_from.timestamp()), int(t_to.replace(tzinfo=pytz.utc).timestamp()), FLAIR)
+search_string = "(and timestamp:{}..{} flair:'{}')".format(t_from, t_to, FLAIR)
 submissions = r.search(search_string, subreddit=SUBREDDIT, sort="new", limit=LIMIT, syntax="cloudsearch")
 
 print("Gathering additional submission statistics:")
