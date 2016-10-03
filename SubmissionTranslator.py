@@ -41,11 +41,10 @@ socket.setdefaulttimeout(10)		# Don't linger too long on pages that don't load
 # See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 # On the right is the text to display for the translated language, on the left is its ISO 639-1 code.
 DEFAULT_TRANSLATIONS = ["fr", "en"]
-USERNAME = "BitwiseShift"
 TIME_BETWEEN_RUNS = 35		# The minimum time between runs is 35.
 # The comment needed to summon the translator. The default syntax given will summon the bot
 # "+/u/YOUR_USERNAME!". The {} in the below string gets replace by your username.
-SUMMON_SYNTAX = "+/u/{}!".format(USERNAME)
+SUMMON_SYNTAX = "+/u/{}!"
 # Setting this to True allows you to override the DEFAULT_TRANSLATIONS by adding a list of 2-letter
 # language codes to the summon, e.g. "+/u/YOUR_USERNAME! en de" will translate to German and English
 # instead of to the default translations. It will only work if the summon is followed by only the
@@ -71,9 +70,10 @@ TRANSLATION_URL = "https://translate.google.com/translate?sl={lang_from}&tl={lan
 COMMENT_REGEX = re.compile("<!--.*-->")
 
 print("Authenticating...")
-r = praw.Reddit('Python:SubmissionTranslator by /u/BitwiseShift, run by {}'.format(USERNAME))
+r = praw.Reddit('Python:SubmissionTranslator by /u/BitwiseShift')
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
+SUMMON_SYNTAX.format(r.user.name)
 before = None
 
 

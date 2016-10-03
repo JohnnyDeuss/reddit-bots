@@ -11,7 +11,6 @@ import OAuth2Util
 # Configuration.
 #
 
-USERNAME = "BitwiseShift"	# Fill in your username.
 SUBREDDIT = "BitwiseShiftTest"		# Subreddit name, without the /r/ part.
 # Flair mapping, before the colon is the flair CSS name you want to change. After the colon is the
 # flair CSS name you want to change it into.
@@ -26,7 +25,7 @@ FLAIR_MAPPING = {
 # Actual bot code
 #
 
-r = praw.Reddit('Python:MassFlairRename by /u/BitwiseShift, run by {}'.format(USERNAME))
+r = praw.Reddit('Python:MassFlairRename by /u/BitwiseShift')
 o = OAuth2Util.OAuth2Util(r)
 o.refresh()
 

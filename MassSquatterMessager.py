@@ -31,7 +31,6 @@ from bs4 import BeautifulSoup
 # Configuration
 #
 
-USERNAME = "BitwiseShift"			# Without the /u/ part
 SQUATTER_USERNAME = "ragwort"		# Without the /u/ part
 EXCLUDE_LIST = ["fagwort"]			# List of users to exclude from the mass messaging.
 TITLE = "Subreddit squatter"		# Message title
@@ -81,7 +80,7 @@ def get_moderated_subreddits(username):
 	return [] if side_mod == None else [tag.text for tag in side_mod.find_all("a")]
 	
 # Globals
-UA = 'Python:MassSquatterMessager by /u/BitwiseShift, run by {}'.format(USERNAME)
+UA = 'Python:MassSquatterMessager by /u/BitwiseShift'
 EXCLUDE_LIST = [user.lower() for user in EXCLUDE_LIST]
 USER_PAGE = "https://www.reddit.com/user/{}/"
 RETRY_DELAY = 2

@@ -12,7 +12,6 @@ from time import sleep
 #
 # Configuration
 #
-USERNAME = "BitwiseShift"
 SUBREDDIT = "BitwiseShiftTest"		# Subreddit name, without the /r/ part.
 # Reply given to deleted comments. Set to an empty string '' to not reply at all.
 REMOVE_MESSAGE = "Wow, your score is low!"
@@ -22,7 +21,7 @@ TIME_BETWEEN_RUNS = 30		# In number of seconds, the minimum is 30 seconds
 #
 # Actual bot
 #
-r = praw.Reddit('Python:DownvotedCommentRemover run by {}'.format(USERNAME))
+r = praw.Reddit('Python:DownvotedCommentRemover')
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
 

@@ -10,10 +10,6 @@
 	but may also give only 1 upvote. It is impossible to get 71% upvote_ratio with 1 upvote. So the
 	upvote count is likely behind, because 71% can be reached with 5 upvotes and 2 downvotes. Don't
 	run this bot perpetually, as it makes way too many requests for little amounts of data.
-	
-	Since Reddit doesn't follow industry standards and uses local time instead of epoch timestamps,
-	you'll need to install pytz, which deals with converting time between timezones and dst.
-	to do this, run "pip install pytz" in the command line.
 
 	Requested by /u/Ace_InTheSleeve.
 	https://www.reddit.com/r/RequestABot/comments/54t6f3/bot_that_aggregates_upvote_percentage_of_threads/
@@ -22,15 +18,11 @@ import praw
 import OAuth2Util
 from datetime import datetime, timedelta
 from time import time
-# Needed to deal with the clusterfuck that is timezones, since Reddit doesn't use epoch timezone,
-# but SF timezone instead. I don't even want to know what they are doing when dst is applied.
-import pytz
 
 
 #
 # Configuration
 #
-USERNAME = "BitwiseShift"
 SUBREDDIT = "BuildAPC"		# Subreddit name, without the /r/ part.
 FLAIR = "Build upgrade"
 LIMIT = 10					# The amount of submissions to load. Using None automatically loads as many as allowed.
@@ -40,7 +32,7 @@ DAYS_TO_GO_BACK = 7			# The end date will likely not be reached for active subs 
 # Actual bot
 #
 print("Authenticating...")
-r = praw.Reddit('Python:StatisticsAggregate by /u/BitwiseShift, run by {}'.format(USERNAME))
+r = praw.Reddit('Python:StatisticsAggregate by /u/BitwiseShift')
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
 
