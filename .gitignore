@@ -1,1 +1,3 @@
 oauth.ini
+client_secret.json
+sheets.googleapis.com-python-*.json
