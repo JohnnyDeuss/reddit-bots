@@ -69,7 +69,7 @@ the script, it means you're missing a module. Often, you can install these
 missing modules by running `pip install {MODULE_NAME}`. If that doesn't work,
 try Googling "Python install {MODULE_NAME}".
 
-### Scheduling
+### Running/scheduling
 Some bots must be scheduled to run every once in a while. These are bots that
 run multiple times, but it doesn't necessarily matter exactly when it is run,
 e.g. deleting old posts, posts don't have to be deleted the second they reach
@@ -77,6 +77,10 @@ the deletion age. The block of text at the top of each script will tell you
 whether the script needs to be scheduled ot not. To set up scheduling for a bot,
 follow the instructions in the scheduling section of
 [the sticky](https://www.reddit.com/r/RequestABot/comments/3d3iss/a_comprehensive_guide_to_running_your_bot_that/)
+
+If the script you're using runs continually or just once, and does not need to
+be scheduled, you can run it by double clicking it. If that doesn't work, you
+can try entering `python c:/Path/to/script.py` in the command prompt.
 
 ## Disclaimer
 I'm making these bots in my spare time. I will do my best to test them as
