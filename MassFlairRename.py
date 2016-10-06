@@ -1,11 +1,12 @@
 """
 	Rename user flair CSS class names on mass.
-	
+
 	Requested by /u/CatAttackPEOW.
 	https://www.reddit.com/r/RequestABot/comments/53vz7g/updating_thousands_of_css_class_flairs/
 """
 import praw
 import OAuth2Util
+
 
 #
 # Configuration.
@@ -25,7 +26,7 @@ FLAIR_MAPPING = {
 # Actual bot code
 #
 
-r = praw.Reddit('Python:MassFlairRename by /u/BitwiseShift')
+r = praw.Reddit("Python:MassFlairRename by /u/BitwiseShift")
 o = OAuth2Util.OAuth2Util(r)
 o.refresh()
 
@@ -33,7 +34,7 @@ after = None
 
 print("Getting users...")
 while True:
-	flairs = list(r.get_flair_list(SUBREDDIT, sort="new", limit=None, params={"after": after}))
+	flairs = list(r.get_flair_list(SUBREDDIT, sort="new", limit=100, params={"after": after}))
 	if not flairs:
 		break
 	lastUser = r.get_redditor(flairs[-1]["user"])	# Already set the after, for pagination.
@@ -61,5 +62,5 @@ while True:
 		r.set_flair_csv(SUBREDDIT, flairs)
 	print("Succesfully changed  {}/{} user flairs!".format(l-unknown_count, l))
 	print("Checking for more flaired users")
-	
+
 print("No more users found!\nDone!")

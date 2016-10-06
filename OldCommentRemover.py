@@ -81,7 +81,7 @@ def matches_filters(submission):
 t_to = int((datetime.now() - REMOVE_AFTER).timestamp()) + 8*60*60
 
 print("Authenticating...")
-r = praw.Reddit('Python:OldCommentRemover by /u/BitwiseShift')
+r = praw.Reddit("Python:OldCommentRemover by /u/BitwiseShift")
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
 

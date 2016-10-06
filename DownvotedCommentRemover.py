@@ -21,7 +21,7 @@ TIME_BETWEEN_RUNS = 30		# In number of seconds, the minimum is 30 seconds
 #
 # Actual bot
 #
-r = praw.Reddit('Python:DownvotedCommentRemover')
+r = praw.Reddit("Python:DownvotedCommentRemover")
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
 

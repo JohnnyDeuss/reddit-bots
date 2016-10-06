@@ -4,11 +4,14 @@
 	named after isn't also a moderator of it. Every user who's username subreddit is being squated
 	will be messaged. This scrapes the squatter's user page to find the subreddits he moderated, as
 	Reddit doesn't have an API call for this.
-	
+
 	For the scraping of HTML, you need to install BeautifulSoup. For logging in securely without
 	a password, OAuth2Util is used, so be sure to read to sticky on /r/RequestABot about installing
 	these.
-	
+
+	For some users, sending messages requires the solving of a captcha, this is
+	not supported by the script at the moment.
+
 	Requested by /u/Stuart98.
 	https://www.reddit.com/r/RequestABot/comments/55dlxk/need_a_bot_to_send_mass_pms_to_users_matching_a/
 
@@ -78,9 +81,9 @@ def get_moderated_subreddits(username):
 	soup = BeautifulSoup(html, 'html.parser')
 	side_mod = soup.find("ul", {"id": "side-mod-list"})
 	return [] if side_mod == None else [tag.text for tag in side_mod.find_all("a")]
-	
+
 # Globals
-UA = 'Python:MassSquatterMessager by /u/BitwiseShift'
+UA = "Python:MassSquatterMessager by /u/BitwiseShift"
 EXCLUDE_LIST = [user.lower() for user in EXCLUDE_LIST]
 USER_PAGE = "https://www.reddit.com/user/{}/"
 RETRY_DELAY = 2

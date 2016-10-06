@@ -3,17 +3,17 @@
 	determine the language of the document, as you'd need an API key for that, which is to difficult
 	for laymen and isn't free. It does use Google translate through a the Google translate page
 	translator instead of the translate API.
-	
+
 	Uses the langdetect module to detect language. Install it with 'pip install langdetect'.
 	Uses the iso-639 module to detect know what language code corresponds to which language. Install
 	it with 'pip install iso-639'.
-	
+
 	Additional features to check for top level comments and multiple replies in the same thread may
 	be necessary.
-	
+
 	Requested by /u/frost_biten.
 	https://www.reddit.com/r/RequestABot/comments/555gew/a_translation_bot_for_rhabs/
-	
+
 	DISCLAIMER:
 	This bot works without being a moderator, but you should never run a bot like this, that
 	responds to every submission, without being a moderator of the subreddit it is running in or
@@ -70,7 +70,7 @@ TRANSLATION_URL = "https://translate.google.com/translate?sl={lang_from}&tl={lan
 COMMENT_REGEX = re.compile("<!--.*-->")
 
 print("Authenticating...")
-r = praw.Reddit('Python:SubmissionTranslator by /u/BitwiseShift')
+r = praw.Reddit("Python:SubmissionTranslator by /u/BitwiseShift")
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
 SUMMON_SYNTAX.format(r.user.name)
@@ -91,7 +91,7 @@ def parse_mention(mention):
 	ret["is_allowed"] = mention.subreddit.display_name.lower() in ALLOWED_SUBREDDITS or not ALLOWED_SUBREDDITS
 	if not ret["is_allowed"]:
 		return ret
-	
+
 	# Look for existing comments from the bot.
 	comments = list(mention.replies)
 	ret["commented_before"] = any(comment.author.name.lower() == r.user.name.lower() for comment in comments)
@@ -106,34 +106,34 @@ def parse_mention(mention):
 				pass
 	else:
 		ret["translate_to"] = DEFAULT_TRANSLATIONS
-	
+
 	pprint(ret["translate_to"])
 	return ret
-	
+
 
 def visible(element):
 	# https://stackoverflow.com/questions/1936466/beautifulsoup-grab-visible-webpage-text
-    if element.parent.name in ['style', 'script', '[document]', 'head', 'title']:
+    if element.parent.name in ["style", "script", "[document]", "head", "title"]:
         return False
     elif COMMENT_REGEX.match(str(element)):
         return False
     return True
 
-	
+
 def run_bot():
 	global before
 	first = True
-	
-	mentions = r.get_mentions(sort="New", params={"before": before})	
+
+	mentions = r.get_mentions(sort="New", params={"before": before})
 	for mention in mentions:
 		if first:				# Update the 'before'.
 			first = False
 			before = mention.name
-		
+
 		print("+ New mention: ID={}".format(mention.id))
 		print("... From: "+mention.permalink)
 		info = parse_mention(mention)
-		
+
 		if not info["is_valid"]:
 			print("... Invalid summon.")
 			continue
@@ -163,17 +163,17 @@ def run_bot():
 			text = "\n\n".join(visible_texts)
 		print("... Detecting language")
 		text_lang = langdetect.detect(text)
-		
+
 		print("... Posting translations")
 		# Generate reply text for each translation language.
 		replies = []
-		
+
 		for lang, lang_reply in info["translate_to"].items():
 			if lang != text_lang:
 				replies.append(("[{lang_reply} version]("+TRANSLATION_URL+").").format(lang_reply=lang_reply, lang_from=text_lang, lang_to=lang, url=urllib.parse.quote(submission.url)))
 		reply_body = "\n\n".join(replies)
 		mention.reply(reply_body)
-		
+
 
 print("Starting bot.")
 while True:

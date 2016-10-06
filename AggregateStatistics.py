@@ -32,7 +32,7 @@ DAYS_TO_GO_BACK = 7			# The end date will likely not be reached for active subs 
 # Actual bot
 #
 print("Authenticating...")
-r = praw.Reddit('Python:StatisticsAggregate by /u/BitwiseShift')
+r = praw.Reddit("Python:StatisticsAggregate by /u/BitwiseShift")
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
 
