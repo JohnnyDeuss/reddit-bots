@@ -35,11 +35,12 @@ TIME_BETWEEN_RUNS = 30		# In number of seconds, the minimum is 30 seconds
 # Read configuration file if one is given.
 if len(argv) == 2:
 	try:
-		exec(open(argv[2], "r").read())
+		with open(argv[1], "r") as f:
+			exec(f.read())
 	except FileNotFoundError as e:
 		print("[ERROR] The config file could not be found.")
 		raise e
-	except:
+	except Exception as e:
 		print("[ERROR] The config file contains error.")
 		raise e
 elif len(argv) > 2:

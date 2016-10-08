@@ -25,7 +25,11 @@ from time import time
 # Inline configuration, this is what you'll have to fill in to get the bot
 # to work. If you want to make a config file, you'll have to copy this section
 # into a new file.
-SUBREDDIT = "PokemonCreate"		# Subreddit name, without the /r/ part.
+
+# Subreddit name, without the /r/ part. Setting this to None will have the
+# script go through your submissions instead. This automatically sets the
+# USE_DELETE option to True.
+SUBREDDIT = "PokemonCreate"
 # After how long posts get deleted. The given example will delete posts that are
 # 2 days old. To delete any posts, regardless of age, simply set all values to 0.
 REMOVE_AFTER = timedelta(weeks=0, days=0, hours=12, minutes=0)
@@ -53,6 +57,11 @@ IGNORE_FILTER = [
 	# Deletes posts that have both the given flair class and text.
 	{"class": "SOME_CSS_CLASS", "text": "SOME_FLAIR_CLASS"},
 ]
+# There are two ways of removing a comments. If this option is False, it will
+# act as a moderator removing comments from their subreddit. If this is true,
+# it will act as a user deleting his own comments. This will however not delete
+# comments that have already been removed by a moderator.
+USE_DELETE = False
 
 
 #
@@ -62,11 +71,12 @@ IGNORE_FILTER = [
 # Read configuration file if one is given.
 if len(argv) == 2:
 	try:
-		exec(open(argv[2], "r").read())
+		with open(argv[1], "r") as f:
+			exec(f.read())
 	except FileNotFoundError as e:
 		print("[ERROR] The config file could not be found.")
 		raise e
-	except:
+	except Exception as e:
 		print("[ERROR] The config file contains error.")
 		raise e
 elif len(argv) > 2:
@@ -99,6 +109,10 @@ def matches_filters(submission):
 	return not matches_filter(submission, IGNORE_FILTER) and matches_filter(submission, DELETE_FILTER)
 
 
+# Enforce config limits.
+if SUBREDDIT == None:
+	USE_DELETE = True
+
 # Compute the date before which comments need to be removed (in Reddit's weird timezone).
 t_to = int((datetime.now() - REMOVE_AFTER).timestamp()) + 8*60*60
 
@@ -114,6 +128,10 @@ if not REMOVE_MODERATOR_POSTS:
 while True:
 	print("Retrieving submissions...")
 	search_string = "timestamp:0..{}".format(t_to)
+	# If we're using delete, search only own submissions instead.
+	if USE_DELETE:
+		search_string = "(and {} author:'{}')".format(search_string, r.user.name)
+	print(search_string)
 	submissions = list(r.search(search_string, subreddit=SUBREDDIT, sort="new", limit=1000, syntax="cloudsearch"))
 
 	if not submissions:		# No submissions, we're done.
@@ -124,7 +142,10 @@ while True:
 
 		if matches_filters(submission):
 			print("Submission matches delete requirements. ID={}".format(submission.id))
-			#submission.remove()
+			if USE_DELETE:
+				submission.delete()
+			else:
+				submission.remove()
 		else:
 			print("Submission does not match delete requirements. ID={}".format(submission.id))
 
