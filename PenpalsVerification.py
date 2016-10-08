@@ -34,7 +34,7 @@
 	to get captchas.
 
 	INSTALL INSTRUCTIONS:
-	Follow the instructions at https://github.com/JohnnyDeuss/reddit-bots#reddit-bots
+	Follow the instructions at https://github.com/JohnnyDeuss/reddit-bots#reddit-bots.
 	This bot has to be scheduled to run every so often. It can also be run
 	manually, but should be done at least before a new verification thread is
 	posted.

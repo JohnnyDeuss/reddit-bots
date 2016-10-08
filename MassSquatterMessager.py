@@ -5,12 +5,13 @@
 	will be messaged. This scrapes the squatter's user page to find the subreddits he moderated, as
 	Reddit doesn't have an API call for this.
 
-	For the scraping of HTML, you need to install BeautifulSoup. For logging in securely without
-	a password, OAuth2Util is used, so be sure to read to sticky on /r/RequestABot about installing
-	these.
-
 	For some users, sending messages requires the solving of a captcha, this is
 	not supported by the script at the moment.
+
+	INSTALL INSTRUCTIONS:
+	Follow the instructions at https://github.com/JohnnyDeuss/reddit-bots#reddit-bots.
+	For the scraping of HTML, you'll need to install BeautifulSoup. This can be
+	installed by running the command `pip install beautifulsoup4`.
 
 	Requested by /u/Stuart98.
 	https://www.reddit.com/r/RequestABot/comments/55dlxk/need_a_bot_to_send_mass_pms_to_users_matching_a/

@@ -4,12 +4,15 @@
 	for laymen and isn't free. It does use Google translate through a the Google translate page
 	translator instead of the translate API.
 
-	Uses the langdetect module to detect language. Install it with 'pip install langdetect'.
-	Uses the iso-639 module to detect know what language code corresponds to which language. Install
-	it with 'pip install iso-639'.
-
 	Additional features to check for top level comments and multiple replies in the same thread may
 	be necessary.
+
+	INSTALL INSTRUCTIONS:
+	Follow the instructions at https://github.com/JohnnyDeuss/reddit-bots#reddit-bots.
+	This script uses the langdetect module to detect languages. Install it with
+	`pip install langdetect`. It also uses the iso-639 module to know which
+	language code corresponds to which language. Install it with
+	'pip install iso-639'.
 
 	Requested by /u/frost_biten.
 	https://www.reddit.com/r/RequestABot/comments/555gew/a_translation_bot_for_rhabs/

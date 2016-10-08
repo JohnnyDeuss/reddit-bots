@@ -11,6 +11,9 @@
 	upvote count is likely behind, because 71% can be reached with 5 upvotes and 2 downvotes. Don't
 	run this bot perpetually, as it makes way too many requests for little amounts of data.
 
+	INSTALL INSTRUCTIONS:
+	Follow the instructions at https://github.com/JohnnyDeuss/reddit-bots#reddit-bots.
+
 	Requested by /u/Ace_InTheSleeve.
 	https://www.reddit.com/r/RequestABot/comments/54t6f3/bot_that_aggregates_upvote_percentage_of_threads/
 """

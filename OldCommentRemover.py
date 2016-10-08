@@ -3,6 +3,9 @@
 	moderator of the given subreddit to run this bot. This bot has to be scheduled, so make sure to
 	read the sticky at /r/RequestABot (https://www.reddit.com/r/RequestABot/comments/3d3iss/a_comprehensive_guide_to_running_your_bot_that/).
 
+	INSTALL INSTRUCTIONS:
+	Follow the instructions at https://github.com/JohnnyDeuss/reddit-bots#reddit-bots.
+
 	Requested by /u/PokestarFan.
 	https://www.reddit.com/r/RequestABot/comments/55m05l/bot_that_deletes_a_post_that_is_x_hours_days_weeks/
 	Updated request:

@@ -1,6 +1,9 @@
 """
 	Removes all comments under a given threshold after replying to them.
 
+	INSTALL INSTRUCTIONS:
+	Follow the instructions at https://github.com/JohnnyDeuss/reddit-bots#reddit-bots.
+
 	Fix requested by /u/Dark_Saint.
 	https://www.reddit.com/r/RequestABot/comments/54sd3i/fix_comment_bot/
 	https://www.reddit.com/r/redditdev/comments/54syiw/question_deleted_comments/
