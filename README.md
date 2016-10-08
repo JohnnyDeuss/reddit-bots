@@ -48,14 +48,6 @@ At the end of these instructions, you'll have an app key and secret, these need
 to be filled in into the `app_key` and `app_secret` fields of the `oauth.ini`
 configuration file.
 
-### Configuring the script
-Each script is divided into four sections. From top to bottom, there is a large
-block of text, explaining what the script is, followed by a list of module
-imports, followed by the configuration, and finally followed by the actual bot
-code. For nearly every script, you'll have to fill in the configuration section
-to get it to work. There will be an example configuration already there, along
-with comment text explaining what each option does.
-
 ***What is it?*** OAuth2Util is a module designed for PRAW. It handles OAuth
 verification in a single line of code. OAuth is a type of authorization that
 grants a script access to an account without requiring a password. It also
@@ -69,18 +61,35 @@ the script, it means you're missing a module. Often, you can install these
 missing modules by running `pip install {MODULE_NAME}`. If that doesn't work,
 try Googling "Python install {MODULE_NAME}".
 
+### Configuring the script
+Each script is divided into four sections. From top to bottom, there is a large
+block of text, explaining what the script is, followed by a list of module
+imports, followed by the configuration, and finally followed by the actual bot
+code. Nearly every script will need to give a configuration for it to work.
+
+There are two ways to enter a configuration. The first way is to fill in the
+configuration section. This is the easiest method, but is only useful if you
+plan on using only one configuration. If you want to use multiple
+configurations, e.g. one configuration per subreddit you're running the script
+on, you should load the configuration from a config file. To do this, copy the
+configuration section of the script into its own file. An example config file
+for `OldCommentRemover.py` is given [here](https://github.com/JohnnyDeuss/reddit-bots/blob/master/OldCommentRemover/remove_all.cfg).
+
 ### Running/scheduling
+If you're not using a config file, you can usually run a script by double
+clicking it. Otherwise, you can enter `python3 c:/Path/to/script.py [config_file]`
+in the command prompt to run the script. Here, `config_file` is an optional
+value that points to the config file you want it to use, e.g.
+`python3 OldCommentRemover.py remove_all.cfg` will run the `OldCommentRemover.py`
+script with the `remove_all.cfg` config file.
+
 Some bots must be scheduled to run every once in a while. These are bots that
 run multiple times, but it doesn't necessarily matter exactly when it is run,
 e.g. deleting old posts, posts don't have to be deleted the second they reach
 the deletion age. The block of text at the top of each script will tell you
-whether the script needs to be scheduled ot not. To set up scheduling for a bot,
+whether the script needs to be scheduled or not. To set up scheduling for a bot,
 follow the instructions in the scheduling section of
 [the sticky](https://www.reddit.com/r/RequestABot/comments/3d3iss/a_comprehensive_guide_to_running_your_bot_that/)
-
-If the script you're using runs continually or just once, and does not need to
-be scheduled, you can run it by double clicking it. If that doesn't work, you
-can try entering `python c:/Path/to/script.py` in the command prompt.
 
 ## Disclaimer
 I'm making these bots in my spare time. I will do my best to test them as

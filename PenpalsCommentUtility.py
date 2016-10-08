@@ -1,4 +1,5 @@
-""" This script extract the information needed for the PenpalsVerification
+"""
+	This script extract the information needed for the PenpalsVerification
 	script. All you need to do is enter the permalink below and run the script.
 	You still need to have set up OAUTH before you can use this script.
 """

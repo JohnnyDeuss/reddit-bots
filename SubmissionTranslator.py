@@ -20,6 +20,7 @@
 	having the moderators' permission. Doing so anyway makes you a dick. No, no. No arguing, it
 	makes you a dick and may get you and your bot banned.
 """
+from sys import argv, exit
 import urllib.request
 import urllib.parse
 import praw
@@ -30,12 +31,16 @@ import langdetect
 from iso639 import languages
 from time import sleep
 import socket
-socket.setdefaulttimeout(10)		# Don't linger too long on pages that don't load
+socket.setdefaulttimeout(10)	# Don't linger too long on pages that don't load
 
 
 #
 # Configuration
 #
+
+# Inline configuration, this is what you'll have to fill in to get the bot
+# to work. If you want to make a config file, you'll have to copy this section
+# into a new file.
 
 # Make sure Google translate supports your languages and enter its ISO 639-1 code.
 # See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
@@ -56,9 +61,24 @@ ALLOW_LANGUAGE_OVERRIDE = True
 # all subreddits.
 ALLOWED_SUBREDDITS = ["BitwiseShiftTest", "Test", ]		# Without the /r/ part.
 
+
 #
 # Actual bot
 #
+
+# Read configuration file if one is given.
+if len(argv) == 2:
+	try:
+		exec(open(argv[2], "r").read())
+	except FileNotFoundError as e:
+		print("[ERROR] The config file could not be found.")
+		raise e
+	except:
+		print("[ERROR] The config file contains error.")
+		raise e
+elif len(argv) > 2:
+	print("[Error] Correct syntax: {} [config_file]".format(argv[0]))
+	exit()
 
 # Change some of the config to be more usable.
 # Store the language codes with their full name.
@@ -97,7 +117,7 @@ def parse_mention(mention):
 	ret["commented_before"] = any(comment.author.name.lower() == r.user.name.lower() for comment in comments)
 
 	poss_lang_codes = get_lang_codes(mention.body)
-	if poss_lang_codes:
+	if ALLOW_LANGUAGE_OVERRIDE and poss_lang_codes
 		ret["translate_to"] = {}
 		for code in poss_lang_codes:
 			try:
@@ -113,11 +133,11 @@ def parse_mention(mention):
 
 def visible(element):
 	# https://stackoverflow.com/questions/1936466/beautifulsoup-grab-visible-webpage-text
-    if element.parent.name in ["style", "script", "[document]", "head", "title"]:
-        return False
-    elif COMMENT_REGEX.match(str(element)):
-        return False
-    return True
+	if element.parent.name in ["style", "script", "[document]", "head", "title"]:
+		return False
+	elif COMMENT_REGEX.match(str(element)):
+		return False
+	return True
 
 
 def run_bot():

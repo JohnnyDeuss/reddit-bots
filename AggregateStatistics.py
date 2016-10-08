@@ -14,6 +14,7 @@
 	Requested by /u/Ace_InTheSleeve.
 	https://www.reddit.com/r/RequestABot/comments/54t6f3/bot_that_aggregates_upvote_percentage_of_threads/
 """
+from sys import argv, exit
 import praw
 import OAuth2Util
 from datetime import datetime, timedelta
@@ -23,14 +24,34 @@ from time import time
 #
 # Configuration
 #
+
+# Inline configuration, this is what you'll have to fill in to get the bot
+# to work. If you want to make a config file, you'll have to copy this section
+# into a new file.
 SUBREDDIT = "BuildAPC"		# Subreddit name, without the /r/ part.
 FLAIR = "Build upgrade"
 LIMIT = 10					# The amount of submissions to load. Using None automatically loads as many as allowed.
 DAYS_TO_GO_BACK = 7			# The end date will likely not be reached for active subs due to the request limit.
 
+
 #
 # Actual bot
 #
+
+# Read configuration file if one is given.
+if len(argv) == 2:
+	try:
+		exec(open(argv[2], "r").read())
+	except FileNotFoundError as e:
+		print("[ERROR] The config file could not be found.")
+		raise e
+	except:
+		print("[ERROR] The config file contains error.")
+		raise e
+elif len(argv) > 2:
+	print("[Error] Correct syntax: {} [config_file]".format(argv[0]))
+	exit()
+
 print("Authenticating...")
 r = praw.Reddit("Python:StatisticsAggregate by /u/BitwiseShift")
 o = OAuth2Util.OAuth2Util(r)

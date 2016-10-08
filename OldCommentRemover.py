@@ -8,6 +8,7 @@
 	Updated request:
 	https://www.reddit.com/r/RequestABot/comments/55p3sg/not_that_deletes_post_with_a_certain_flair/
 """
+from sys import argv, exit
 import praw
 import OAuth2Util
 from datetime import datetime, timedelta
@@ -18,6 +19,9 @@ from time import time
 # Configuration
 #
 
+# Inline configuration, this is what you'll have to fill in to get the bot
+# to work. If you want to make a config file, you'll have to copy this section
+# into a new file.
 SUBREDDIT = "PokemonCreate"		# Subreddit name, without the /r/ part.
 # After how long posts get deleted. The given example will delete posts that are
 # 2 days old. To delete any posts, regardless of age, simply set all values to 0.
@@ -51,6 +55,21 @@ IGNORE_FILTER = [
 #
 # Actual bot
 #
+
+# Read configuration file if one is given.
+if len(argv) == 2:
+	try:
+		exec(open(argv[2], "r").read())
+	except FileNotFoundError as e:
+		print("[ERROR] The config file could not be found.")
+		raise e
+	except:
+		print("[ERROR] The config file contains error.")
+		raise e
+elif len(argv) > 2:
+	print("[Error] Correct syntax: {} [config_file]".format(argv[0]))
+	exit()
+
 
 def matches_filter(submission, filter):
 	css_class = submission.link_flair_css_class if submission.link_flair_css_class != None else ""

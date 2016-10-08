@@ -46,11 +46,9 @@
 	Requested by /u/wmeacham.
 	https://www.reddit.com/r/RequestABot/comments/562dre/mod_of_rpenpals_requesting_a_bot_to_assist_with/
 """
-from pprint import pprint
-
+from sys import argv, exit
 from collections import OrderedDict
 from functools import reduce
-from sys import exit
 import re
 import httplib2
 
@@ -69,6 +67,10 @@ import OAuth2Util
 #
 # Configuration.
 #
+
+# Inline configuration, this is what you'll have to fill in to get the bot
+# to work. If you want to make a config file, you'll have to copy this section
+# into a new file.
 
 # The ID of the spreadsheet, which can be found in the URL. This example is the
 # ID for https://docs.google.com/spreadsheets/d/1v8SVnzrGaupBKm6CbtmPjMqOrkcl0_sfEW0eEcujkys/edit
@@ -124,22 +126,37 @@ RANKS = OrderedDict([
 # Actual bot code
 #
 
+# Read configuration file if one is given.
+if len(argv) == 2:
+	try:
+		exec(open(argv[2], "r").read())
+	except FileNotFoundError as e:
+		print("[ERROR] The config file could not be found.")
+		raise e
+	except:
+		print("[ERROR] The config file contains error.")
+		raise e
+elif len(argv) > 2:
+	print("[Error] Correct syntax: {} [config_file]".format(argv[0]))
+	exit()
+
+
 class colors:
 	# Adapted from https://stackoverflow.com/questions/287871/print-in-terminal-with-colors-using-python
-    OK = "\033[92m\033[1m"
-    WARNING = "\033[93m\033[1m"
-    ERROR = "\033[91m\033[1m"
-    INPUT = "\033[94m\033[1m"
-    ENDC = "\033[0m"
+	OK = "\033[92m\033[1m"
+	WARNING = "\033[93m\033[1m"
+	ERROR = "\033[91m\033[1m"
+	INPUT = "\033[94m\033[1m"
+	ENDC = "\033[0m"
 
 
 def get_credentials():
-	""" Gets valid user credentials from storage.
-	If nothing has been stored, or if the stored credentials are invalid,
-	the OAuth2 flow is completed to obtain the new credentials.
+	"""	Gets valid user credentials from storage.
+		If nothing has been stored, or if the stored credentials are invalid,
+		the OAuth2 flow is completed to obtain the new credentials.
 
-	Returns:
-	Credentials, the obtained credential.
+		Returns:
+		Credentials, the obtained credential.
 	"""
 	store = Storage("sheets.googleapis.com-python-penpalsbot.json")
 	credentials = store.get()
@@ -314,9 +331,9 @@ def update_flairs(changed_flairs):
 	# Only give a warning the first time an unknown class is encountered.
 	if unknowns:
 		input(colors.INPUT+"[INPUT NEEDED]"+colors.ENDC+" There were some unknown CSS flair classes!\n"
-			"               This probably means you forgot to define that class.\n"
-			"               Close the progam now and fix the error, or press ENTER\n"
-			"               to continue, ignoring any errors.")
+			"			   This probably means you forgot to define that class.\n"
+			"			   Close the progam now and fix the error, or press ENTER\n"
+			"			   to continue, ignoring any errors.")
 	while flairs:
 		# Update flairs.
 		to_i = min(flairs.len, 100)

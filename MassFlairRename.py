@@ -4,6 +4,7 @@
 	Requested by /u/CatAttackPEOW.
 	https://www.reddit.com/r/RequestABot/comments/53vz7g/updating_thousands_of_css_class_flairs/
 """
+from sys import argv, exit
 import praw
 import OAuth2Util
 
@@ -12,6 +13,9 @@ import OAuth2Util
 # Configuration.
 #
 
+# Inline configuration, this is what you'll have to fill in to get the bot
+# to work. If you want to make a config file, you'll have to copy this section
+# into a new file.
 SUBREDDIT = "BitwiseShiftTest"		# Subreddit name, without the /r/ part.
 # Flair mapping, before the colon is the flair CSS name you want to change. After the colon is the
 # flair CSS name you want to change it into.
@@ -22,9 +26,24 @@ FLAIR_MAPPING = {
 	# ...
 }
 
+
 #
 # Actual bot code
 #
+
+# Read configuration file if one is given.
+if len(argv) == 2:
+	try:
+		exec(open(argv[2], "r").read())
+	except FileNotFoundError as e:
+		print("[ERROR] The config file could not be found.")
+		raise e
+	except:
+		print("[ERROR] The config file contains error.")
+		raise e
+elif len(argv) > 2:
+	print("[Error] Correct syntax: {} [config_file]".format(argv[0]))
+	exit()
 
 r = praw.Reddit("Python:MassFlairRename by /u/BitwiseShift")
 o = OAuth2Util.OAuth2Util(r)

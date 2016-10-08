@@ -21,12 +21,12 @@
 	unless you have a damn good reason. Don't be a dick. Mass messaging is spam if there isn't a
 	good reason and spamming gets you banned. Don't be a dick.
 """
+from sys import argv, exit
 import urllib.request
 import urllib.error
 import praw
 import OAuth2Util
 from time import sleep
-from sys import exit
 from bs4 import BeautifulSoup
 
 
@@ -34,6 +34,9 @@ from bs4 import BeautifulSoup
 # Configuration
 #
 
+# Inline configuration, this is what you'll have to fill in to get the bot
+# to work. If you want to make a config file, you'll have to copy this section
+# into a new file.
 SQUATTER_USERNAME = "ragwort"		# Without the /u/ part
 EXCLUDE_LIST = ["fagwort"]			# List of users to exclude from the mass messaging.
 TITLE = "Subreddit squatter"		# Message title
@@ -54,6 +57,21 @@ Sincerely, /u/{ME}.
 #
 # Actual bot
 #
+
+# Read configuration file if one is given.
+if len(argv) == 2:
+	try:
+		exec(open(argv[2], "r").read())
+	except FileNotFoundError as e:
+		print("[ERROR] The config file could not be found.")
+		raise e
+	except:
+		print("[ERROR] The config file contains error.")
+		raise e
+elif len(argv) > 2:
+	print("[Error] Correct syntax: {} [config_file]".format(argv[0]))
+	exit()
+
 
 def get_moderated_subreddits(username):
 	""" Get the subreddit someone moderates. The Reddit API doesn't have an entrypoint for this,
@@ -82,13 +100,13 @@ def get_moderated_subreddits(username):
 	side_mod = soup.find("ul", {"id": "side-mod-list"})
 	return [] if side_mod == None else [tag.text for tag in side_mod.find_all("a")]
 
-# Globals
+
+# Static bot constants.
 UA = "Python:MassSquatterMessager by /u/BitwiseShift"
 EXCLUDE_LIST = [user.lower() for user in EXCLUDE_LIST]
 USER_PAGE = "https://www.reddit.com/user/{}/"
 RETRY_DELAY = 2
 MAX_ATTEMPTS = 5
-
 
 print("Retrieving squatter's user page...")
 subreddits = get_moderated_subreddits(SQUATTER_USERNAME)
