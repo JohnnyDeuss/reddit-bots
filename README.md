@@ -73,15 +73,15 @@ plan on using only one configuration. If you want to use multiple
 configurations, e.g. one configuration per subreddit you're running the script
 on, you should load the configuration from a config file. To do this, copy the
 configuration section of the script into its own file. An example config file
-for `OldCommentRemover.py` is given [here](https://github.com/JohnnyDeuss/reddit-bots/blob/master/OldCommentRemover/remove_all.cfg).
+for [`OldCommentRemover.py`](https://github.com/JohnnyDeuss/reddit-bots/blob/master/OldCommentRemover/OldCommentRemover.py) is given [here](https://github.com/JohnnyDeuss/reddit-bots/blob/master/OldCommentRemover/remove_all.cfg).
 
 ### Running/scheduling
 If you're not using a config file, you can usually run a script by double
 clicking it. Otherwise, you can enter `python3 c:/Path/to/script.py [config_file]`
 in the command prompt to run the script. Here, `config_file` is an optional
 value that points to the config file you want it to use, e.g.
-`python3 OldCommentRemover.py remove_all.cfg` will run the `OldCommentRemover.py`
-script with the `remove_all.cfg` config file.
+`python3 OldCommentRemover.py remove_all.cfg` will run the [`OldCommentRemover.py`](https://github.com/JohnnyDeuss/reddit-bots/blob/master/OldCommentRemover/OldCommentRemover.py)
+script with the [`remove_all.cfg`](https://github.com/JohnnyDeuss/reddit-bots/blob/master/OldCommentRemover/remove_all.cfg) config file.
 
 Some bots must be scheduled to run every once in a while. These are bots that
 run multiple times, but it doesn't necessarily matter exactly when it is run,
