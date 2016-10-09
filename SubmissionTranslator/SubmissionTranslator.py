@@ -16,10 +16,6 @@ socket.setdefaulttimeout(10)	# Don't linger too long on pages that don't load
 # Configuration
 #
 
-# Inline configuration, this is what you'll have to fill in to get the bot
-# to work. If you want to make a config file, you'll have to copy this section
-# into a new file.
-
 # Make sure Google translate supports your languages and enter its ISO 639-1 code.
 # See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 # On the right is the text to display for the translated language, on the left is its ISO 639-1 code.

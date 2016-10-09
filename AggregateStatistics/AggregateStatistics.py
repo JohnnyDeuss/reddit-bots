@@ -9,9 +9,6 @@ from time import time
 # Configuration
 #
 
-# Inline configuration, this is what you'll have to fill in to get the bot
-# to work. If you want to make a config file, you'll have to copy this section
-# into a new file.
 SUBREDDIT = "BuildAPC"		# Subreddit name, without the /r/ part.
 FLAIR = "Build upgrade"
 LIMIT = 10					# The amount of submissions to load. Using None automatically loads as many as allowed.

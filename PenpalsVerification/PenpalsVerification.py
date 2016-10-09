@@ -20,10 +20,6 @@ import OAuth2Util
 # Configuration.
 #
 
-# Inline configuration, this is what you'll have to fill in to get the bot
-# to work. If you want to make a config file, you'll have to copy this section
-# into a new file.
-
 # The ID of the spreadsheet, which can be found in the URL. This example is the
 # ID for https://docs.google.com/spreadsheets/d/1v8SVnzrGaupBKm6CbtmPjMqOrkcl0_sfEW0eEcujkys/edit
 SPREADSHEET_ID = "1v8SVnzrGaupBKm6CbtmPjMqOrkcl0_sfEW0eEcujkys"

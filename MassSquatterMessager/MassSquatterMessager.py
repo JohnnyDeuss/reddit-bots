@@ -11,9 +11,6 @@ from bs4 import BeautifulSoup
 # Configuration
 #
 
-# Inline configuration, this is what you'll have to fill in to get the bot
-# to work. If you want to make a config file, you'll have to copy this section
-# into a new file.
 SQUATTER_USERNAME = "ragwort"		# Without the /u/ part
 EXCLUDE_LIST = ["fagwort"]			# List of users to exclude from the mass messaging.
 TITLE = "Subreddit squatter"		# Message title

@@ -9,10 +9,6 @@ from time import time
 # Configuration
 #
 
-# Inline configuration, this is what you'll have to fill in to get the bot
-# to work. If you want to make a config file, you'll have to copy this section
-# into a new file.
-
 # Subreddit name, without the /r/ part. Setting this to None will have the
 # script go through your submissions instead. This automatically sets the
 # USE_DELETE option to True.
