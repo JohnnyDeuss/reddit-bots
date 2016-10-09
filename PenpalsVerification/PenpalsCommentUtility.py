@@ -1,7 +1,10 @@
 """
-	This script extract the information needed for the PenpalsVerification
-	script. All you need to do is enter the permalink below and run the script.
-	You still need to have set up OAUTH before you can use this script.
+	This script extracts the information needed for the PenpalsVerification
+	script. Only set the "prev comment time" and "prev thread" values if you've
+	already manually handled all comments before, and including, the comment
+	whose permalink you'll copy. The permalink for this comment has to be
+	entered below. You still need to have set up OAUTH before you can use this
+	script.
 """
 import praw
 import OAuth2Util
@@ -11,7 +14,7 @@ COMMENT_PERMALINK = "https://www.reddit.com/r/penpals/comments/55bpim/monthly_ve
 
 
 print("Authenticating with Reddit...")
-r = praw.Reddit("Python:PenpalsVerification by /u/BitwiseShift")
+r = praw.Reddit("Python:PenpalsVerificationUtility by /u/BitwiseShift")
 o = OAuth2Util.OAuth2Util(r)
 o.refresh()
 

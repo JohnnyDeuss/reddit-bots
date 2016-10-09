@@ -12,7 +12,7 @@
 	This script uses the langdetect module to detect languages. Install it with
 	`pip install langdetect`. It also uses the iso-639 module to know which
 	language code corresponds to which language. Install it with
-	'pip install iso-639'.
+	`pip install iso-639`.
 
 	Requested by /u/frost_biten.
 	https://www.reddit.com/r/RequestABot/comments/555gew/a_translation_bot_for_rhabs/

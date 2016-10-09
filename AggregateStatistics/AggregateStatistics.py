@@ -1,22 +1,3 @@
-"""
-	This will aggregate flair statistics over the newest submissions returned by a search. The
-	generated statistics are total/avg upvotes, estimated total/avg downvotes, estimated total/avg
-	votes and average upvote percentage. The bot can be altered to look for other kind of post by
-	changing the search request.
-
-	This bot is extremely slow because it has to make a lot of requests. Getting downvote count is
-	very difficult, intentionally so. Even after the slow process of gathering them, the result is
-	still an estimate, as it is derived from the upvote_ratio. An upvote_ratio of 71% may be given
-	but may also give only 1 upvote. It is impossible to get 71% upvote_ratio with 1 upvote. So the
-	upvote count is likely behind, because 71% can be reached with 5 upvotes and 2 downvotes. Don't
-	run this bot perpetually, as it makes way too many requests for little amounts of data.
-
-	INSTALL INSTRUCTIONS:
-	Follow the instructions at https://github.com/JohnnyDeuss/reddit-bots#reddit-bots.
-
-	Requested by /u/Ace_InTheSleeve.
-	https://www.reddit.com/r/RequestABot/comments/54t6f3/bot_that_aggregates_upvote_percentage_of_threads/
-"""
 from sys import argv, exit
 import praw
 import OAuth2Util

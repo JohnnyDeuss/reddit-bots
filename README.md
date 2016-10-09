@@ -1,15 +1,18 @@
 # reddit-bots
 This repository contains a collection of scripts and bots for Reddit. These
 scripts were requested at
-[/r/RequestABot](https://www.reddit.com/r/RequestABot). At the top of each
-script, there will be a description of the task it performs and by whom and
-where it was requested.
+[/r/RequestABot](https://www.reddit.com/r/RequestABot). Each script is
+accompanied with a README.md file that explains what the script does, who
+requested it and any additional install instructions that may be necessary for
+that script. Some scripts may also be accompanied by .cfg files, which contain
+a possible configuration for that script, along with an explanation of what that
+that configuration will do.
 
-## Running the bots
-To run these bots, your computer needs to have a number of things installed.
+## Running the scripts
+To run these scripts, your computer needs to have a number of things installed.
 Each script is written in the Python 3 programming language and uses a number of
-modules, which extend Python with features to make scripts easier to
-write. If at any point you get stuck, try looking through
+modules, which extend Python with features to make scripts easier to write. If
+at any point you get stuck, try looking through
 [the sticky](https://www.reddit.com/r/RequestABot/comments/3d3iss/a_comprehensive_guide_to_running_your_bot_that/)
 on [/r/RequestABot](https://www.reddit.com/r/RequestABot) or in the comment
 section of the original request. If all else fails, feel free to contact me
