@@ -1,12 +1,3 @@
-"""
-	Rename user flair CSS class names on mass.
-
-	INSTALL INSTRUCTIONS:
-	Follow the instructions at https://github.com/JohnnyDeuss/reddit-bots#reddit-bots.
-
-	Requested by /u/CatAttackPEOW.
-	https://www.reddit.com/r/RequestABot/comments/53vz7g/updating_thousands_of_css_class_flairs/
-"""
 from sys import argv, exit
 import praw
 import OAuth2Util

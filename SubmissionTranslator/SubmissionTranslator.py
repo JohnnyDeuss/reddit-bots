@@ -1,28 +1,3 @@
-"""
-	This bot can be summoned to translate a submission. It does not use Google's autodetection to
-	determine the language of the document, as you'd need an API key for that, which is to difficult
-	for laymen and isn't free. It does use Google translate through a the Google translate page
-	translator instead of the translate API.
-
-	Additional features to check for top level comments and multiple replies in the same thread may
-	be necessary.
-
-	INSTALL INSTRUCTIONS:
-	Follow the instructions at https://github.com/JohnnyDeuss/reddit-bots#reddit-bots.
-	This script uses the langdetect module to detect languages. Install it with
-	`pip install langdetect`. It also uses the iso-639 module to know which
-	language code corresponds to which language. Install it with
-	'pip install iso-639'.
-
-	Requested by /u/frost_biten.
-	https://www.reddit.com/r/RequestABot/comments/555gew/a_translation_bot_for_rhabs/
-
-	DISCLAIMER:
-	This bot works without being a moderator, but you should never run a bot like this, that
-	responds to every submission, without being a moderator of the subreddit it is running in or
-	having the moderators' permission. Doing so anyway makes you a dick. No, no. No arguing, it
-	makes you a dick and may get you and your bot banned.
-"""
 from sys import argv, exit
 import urllib.request
 import urllib.parse
