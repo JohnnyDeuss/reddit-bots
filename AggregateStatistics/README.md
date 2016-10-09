@@ -16,6 +16,5 @@ amounts of data.
 
 Request posted [here](https://www.reddit.com/r/RequestABot/comments/54t6f3/bot_that_aggregates_upvote_percentage_of_threads/) by [/u/Ace_InTheSleeve](https://www.reddit.com/user/Ace_InTheSleeve).
 
-
 ## Installation instructions
 Follow the instructions [here](https://github.com/JohnnyDeuss/reddit-bots).

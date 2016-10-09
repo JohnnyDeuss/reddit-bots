@@ -33,7 +33,6 @@ to get captchas.
 Requested [here](https://www.reddit.com/r/RequestABot/comments/562dre/mod_of_rpenpals_requesting_a_bot_to_assist_with/)
 by [/u/wmeacham](https://www.reddit.com/user/wmeacham).
 
-
 ## Installation instructions
 First, follow the instructions [here](https://github.com/JohnnyDeuss/reddit-bots).
 This bot has to be scheduled to run every so often. It can also be run manually,
