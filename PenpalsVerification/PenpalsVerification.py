@@ -100,11 +100,11 @@ COUNT_THRESHOLD_USER = 10
 # comment is high, instead of just the verified count for a single user.
 COUNT_THRESHOLD_COMMENT = 30
 # A list of mods that will be mailed if the bot encounters something fishy. If
-# the list is empty, no mods will be mailed. If the value is set to None, the
-# bot will automatically retrieve the list of all moderators and mail all of
-# them. Usernames are always written without the /u/ part.
+# the list is empty, no mods will be mailed. Usernames are always written
+# without the /u/ part. To send to all moderators of a subreddit, write
+# /r/subreddit_name
 #MODS = ["wmeacham", ]
-#MODS = None
+#MODS = ["/r/penpals", ]
 MODS = ["BitwiseShift"]
 # A definition of all ranks in descending order of prestige. The first value
 # must be the flair CSS class, the second is a function determining whether
@@ -184,8 +184,6 @@ def get_verification_thread():
 def message_mods(subject, message):
 	""" Lazy loaded send mods a message. """
 	global MODS
-	if MODS == None:
-		MODS = list(r.get_moderators(SUBREDDIT))
 	for mod in MODS:
 		try:
 			r.send_message(mod, subject, message, from_sr=SUBREDDIT)

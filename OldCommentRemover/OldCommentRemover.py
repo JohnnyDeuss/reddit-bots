@@ -131,7 +131,6 @@ while True:
 	# If we're using delete, search only own submissions instead.
 	if USE_DELETE:
 		search_string = "(and {} author:'{}')".format(search_string, r.user.name)
-	print(search_string)
 	submissions = list(r.search(search_string, subreddit=SUBREDDIT, sort="new", limit=1000, syntax="cloudsearch"))
 
 	if not submissions:		# No submissions, we're done.
