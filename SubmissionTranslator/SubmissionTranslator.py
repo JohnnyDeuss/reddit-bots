@@ -1,31 +1,3 @@
-<<<<<<< HEAD
-=======
-"""
-	This bot can be summoned to translate a submission. It does not use Google's autodetection to
-	determine the language of the document, as you'd need an API key for that, which is to difficult
-	for laymen and isn't free. It does use Google translate through a the Google translate page
-	translator instead of the translate API.
-
-	Additional features to check for top level comments and multiple replies in the same thread may
-	be necessary.
-
-	INSTALL INSTRUCTIONS:
-	Follow the instructions at https://github.com/JohnnyDeuss/reddit-bots#reddit-bots.
-	This script uses the langdetect module to detect languages. Install it with
-	`pip install langdetect`. It also uses the iso-639 module to know which
-	language code corresponds to which language. Install it with
-	`pip install iso-639`.
-
-	Requested by /u/frost_biten.
-	https://www.reddit.com/r/RequestABot/comments/555gew/a_translation_bot_for_rhabs/
-
-	DISCLAIMER:
-	This bot works without being a moderator, but you should never run a bot like this, that
-	responds to every submission, without being a moderator of the subreddit it is running in or
-	having the moderators' permission. Doing so anyway makes you a dick. No, no. No arguing, it
-	makes you a dick and may get you and your bot banned.
-"""
->>>>>>> a6afbd2ca3b3cfb79177697a0820e5079896af39
 from sys import argv, exit
 import urllib.request
 import urllib.parse
@@ -96,7 +68,7 @@ print("Authenticating...")
 r = praw.Reddit("Python:SubmissionTranslator by /u/BitwiseShift")
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
-SUMMON_SYNTAX.format(r.user.name)
+SUMMON_SYNTAX = SUMMON_SYNTAX.format(r.user.name).lower()
 before = None
 
 
@@ -108,7 +80,7 @@ def get_lang_codes(body):
 
 def parse_mention(mention):
 	""" Parse the summon. Check validity and generate translations list. """
-	ret = {"is_valid": mention.body.startswith(SUMMON_SYNTAX)}
+	ret = {"is_valid": mention.body.lower().startswith(SUMMON_SYNTAX)}
 	if not ret["is_valid"]:
 		return ret
 	ret["is_allowed"] = mention.subreddit.display_name.lower() in ALLOWED_SUBREDDITS or not ALLOWED_SUBREDDITS
@@ -119,8 +91,8 @@ def parse_mention(mention):
 	comments = list(mention.replies)
 	ret["commented_before"] = any(comment.author.name.lower() == r.user.name.lower() for comment in comments)
 
-	poss_lang_codes = get_lang_codes(mention.body)
-	if ALLOW_LANGUAGE_OVERRIDE and poss_lang_codes
+	poss_lang_codes = get_lang_codes(mention.body.lower())
+	if ALLOW_LANGUAGE_OVERRIDE and poss_lang_codes:
 		ret["translate_to"] = {}
 		for code in poss_lang_codes:
 			try:
@@ -129,8 +101,6 @@ def parse_mention(mention):
 				pass
 	else:
 		ret["translate_to"] = DEFAULT_TRANSLATIONS
-
-	pprint(ret["translate_to"])
 	return ret
 
 
@@ -159,43 +129,45 @@ def run_bot():
 
 		if not info["is_valid"]:
 			print("... Invalid summon.")
-			continue
-		if not info["is_allowed"]:
+		elif not info["is_allowed"]:
 			print("... I'm not allowed to go into that subreddit!")
 			continue
-		if info["commented_before"]:
+		elif info["commented_before"]:
 			print("... I've replied to this mention before! Ignoring.")
 			continue
-		submission = mention.submission
-		if submission.is_self:
-			pass
-			print("... Text submission, using selftext")
-			text = submission.title+"\n"+submission.selftext
 		else:
-			print("... Link submission, retrieving URL")
-			try:
-				f = urllib.request.urlopen(submission.url)
-			except:
-				print("... Something went wrong while getting the url, skipping.")
-				continue
-			html = f.read().decode()
-			# Get all visible text in the document, to detect the language.
-			soup = BeautifulSoup(html, 'html.parser')
-			texts = soup.findAll(text=True)
-			visible_texts = filter(visible, texts)
-			text = "\n\n".join(visible_texts)
-		print("... Detecting language")
-		text_lang = langdetect.detect(text)
+			submission = mention.submission
+			if submission.is_self:
+				pass
+				print("... Text submission, using selftext")
+				text = submission.title+"\n"+submission.selftext
+			else:
+				print("... Link submission, retrieving URL")
+				try:
+					f = urllib.request.urlopen(submission.url)
+				except:
+					print("... Something went wrong while getting the url, skipping.")
+					continue
+				html = f.read().decode()
+				# Get all visible text in the document, to detect the language.
+				soup = BeautifulSoup(html, 'html.parser')
+				texts = soup.findAll(text=True)
+				visible_texts = filter(visible, texts)
+				text = "\n\n".join(visible_texts)
+			print("... Detecting language")
+			text_lang = langdetect.detect(text)
 
-		print("... Posting translations")
-		# Generate reply text for each translation language.
-		replies = []
+			print("... Posting translations")
+			# Generate reply text for each translation language.
+			replies = []
 
-		for lang, lang_reply in info["translate_to"].items():
-			if lang != text_lang:
-				replies.append(("[{lang_reply} version]("+TRANSLATION_URL+").").format(lang_reply=lang_reply, lang_from=text_lang, lang_to=lang, url=urllib.parse.quote(submission.url)))
-		reply_body = "\n\n".join(replies)
-		mention.reply(reply_body)
+			for lang, lang_reply in info["translate_to"].items():
+				if lang != text_lang:
+					replies.append(("[{lang_reply} version]("+TRANSLATION_URL+").").format(lang_reply=lang_reply, lang_from=text_lang, lang_to=lang, url=urllib.parse.quote(submission.url)))
+			reply_body = "\n\n".join(replies)
+			mention.reply(reply_body)
+		print("... Deleting mention")
+		mention.delete()
 
 
 print("Starting bot.")
