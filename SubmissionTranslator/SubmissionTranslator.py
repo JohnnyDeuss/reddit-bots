@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import re
 import langdetect
 from iso639 import languages
-from time import sleep
+from time import sleep, time
 import socket
 socket.setdefaulttimeout(10)	# Don't linger too long on pages that don't load
 
@@ -16,24 +16,39 @@ socket.setdefaulttimeout(10)	# Don't linger too long on pages that don't load
 # Configuration
 #
 
-# Make sure Google translate supports your languages and enter its ISO 639-1 code.
-# See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
-# On the right is the text to display for the translated language, on the left is its ISO 639-1 code.
-DEFAULT_TRANSLATIONS = ["fr", "en"]
+# Make sure Google translate supports your languages and enter its ISO 639-1
+# code. See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes.
+# On the right is the text to display for the translated language, on the left
+# is its ISO 639-1 code.
+DEFAULT_TRANSLATIONS = ["fr", "en", ]
 TIME_BETWEEN_RUNS = 35		# The minimum time between runs is 35.
-# The comment needed to summon the translator. The default syntax given will summon the bot
-# "+/u/YOUR_USERNAME!". The {} in the below string gets replace by your username.
+# Automatically translate incoming submissions. Only submission in a language
+# given in AUTO_TRANSLATED_LANGUAGES will be translated. Auto-translate always
+# translates to the default translations.
+ENABLE_AUTO_TRANSLATE = True
+# Languages that will be automatically translated, without having to be summoned.
+# Any detected language that is not in this list will be translated to the
+# default languages.
+AUTO_TRANSLATE_IF_NOT = ["en", ]
+# Allows the bot to be summoned to a thread with a command (see below).
+ENABLE_SUMMONING = True
+# The comment needed to summon the translator. The default syntax given will
+# summon the bot "+/u/YOUR_USERNAME!". The {} in the below string gets replace
+# by your username. To disable summoning
 SUMMON_SYNTAX = "+/u/{}!"
-# Setting this to True allows you to override the DEFAULT_TRANSLATIONS by adding a list of 2-letter
-# language codes to the summon, e.g. "+/u/YOUR_USERNAME! en de" will translate to German and English
-# instead of to the default translations. It will only work if the summon is followed by only the
-# list of two letter codes. If what follows isn't that list, it will be ignored, e.g. if followed by
-# a comment ""+/u/YOUR_USERNAME! I love this bot!" will translate to the defaults.
+# Setting this to True allows you to override the DEFAULT_TRANSLATIONS by adding
+# a list of 2-letter language codes to the summon, e.g. "+/u/YOUR_USERNAME! en de"
+# will translate to German and English instead of to the default translations.
+# It will only work if the summon is followed by only the list of two letter
+# codes. If what follows isn't that list, it will be ignored, e.g. if followed
+# by a comment ""+/u/YOUR_USERNAME! I love this bot!" will translate to the
+# defaults.
 ALLOW_LANGUAGE_OVERRIDE = True
-#  by putting them in this list. If the list is empty, it will repond to mentions originating from
-# This bot does not run in a specific subreddit, you can limit in which subreddits this bot will act
-# all subreddits.
-ALLOWED_SUBREDDITS = ["BitwiseShiftTest", "Test", ]		# Without the /r/ part.
+# This bot runs in specific subreddits. These subreddits have to be listed below.
+# Only incoming submissions on and mentions coming from these subreddits will be
+# processed.
+ALLOWED_SUBREDDITS = ["BitwiseShiftTest", ]		# Without the /r/ part.
+
 
 
 #
@@ -69,7 +84,8 @@ r = praw.Reddit("Python:SubmissionTranslator by /u/BitwiseShift")
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
 SUMMON_SYNTAX = SUMMON_SYNTAX.format(r.user.name).lower()
-before = None
+before_mention = None
+before_submission = {sr: None for sr in ALLOWED_SUBREDDITS}
 
 
 def get_lang_codes(body):
@@ -113,61 +129,96 @@ def visible(element):
 	return True
 
 
+def get_language(submission):
+	if submission.is_self:
+		pass
+		print("... Text submission, using selftext.")
+		text = submission.title+"\n"+submission.selftext
+	else:
+		print("... Link submission, retrieving URL.")
+		try:
+			f = urllib.request.urlopen(submission.url)
+		except:
+			print("... Something went wrong while getting the url, skipping.")
+			return None
+		html = f.read().decode(f.info().get_content_charset()).encode("ascii", errors="ignore")
+		# Get all visible text in the document, to detect the language.
+		soup = BeautifulSoup(html, 'html.parser')
+		texts = soup.findAll(text=True)
+		visible_texts = filter(visible, texts)
+		text = "\n\n".join(visible_texts)
+	print("... Detecting language")
+	return langdetect.detect(text)
+
+
+def generate_translation(text_lang, translate_to, url):
+	print("... Posting translations")
+	# Generate reply text for each translation language.
+	replies = []
+
+	for lang, lang_reply in translate_to.items():
+		if lang != text_lang:
+			replies.append(("[{lang_reply} version]("+TRANSLATION_URL+").").format(lang_reply=lang_reply, lang_from=text_lang, lang_to=lang, url=urllib.parse.quote(url)))
+	return "\n\n".join(replies)
+
+
+def commented_before_top_level(submission):
+	comments = list(submission.comments)
+	oldLen = 0
+	newLen = len(comments)
+	while newLen != oldLen:
+		oldLen = newLen
+		submission.replace_more_comments()
+		comments = list(submission.comments)
+		newLen = len(comments)
+	is_mine = [comment.author.name == r.user.name for comment in comments]
+	return any(is_mine)
+
+
 def run_bot():
-	global before
-	first = True
-
-	mentions = r.get_mentions(sort="New", params={"before": before})
-	for mention in mentions:
-		if first:				# Update the 'before'.
-			first = False
-			before = mention.name
-
-		print("+ New mention: ID={}".format(mention.id))
-		print("... From: "+mention.permalink)
-		info = parse_mention(mention)
-
-		if not info["is_valid"]:
-			print("... Invalid summon.")
-		elif not info["is_allowed"]:
-			print("... I'm not allowed to go into that subreddit!")
-			continue
-		elif info["commented_before"]:
-			print("... I've replied to this mention before! Ignoring.")
-			continue
-		else:
-			submission = mention.submission
-			if submission.is_self:
-				pass
-				print("... Text submission, using selftext")
-				text = submission.title+"\n"+submission.selftext
+	if ENABLE_SUMMONING:
+		global before_mention
+		mentions = r.get_mentions(sort="New", params={"before": before_mention})
+		first = True
+		for mention in mentions:
+			if first:				# Update the 'before'.
+				first = False
+				before_mention = mention.name
+			print("+ New mention: ID={}".format(mention.id))
+			print("... From: "+mention.permalink)
+			info = parse_mention(mention)
+			if not info["is_valid"]:
+				print("... Invalid summon.")
+			elif not info["is_allowed"]:
+				print("... I'm not allowed to go into that subreddit!")
+			elif info["commented_before"]:
+				print("... I've replied to this mention before! Ignoring.")
 			else:
-				print("... Link submission, retrieving URL")
-				try:
-					f = urllib.request.urlopen(submission.url)
-				except:
-					print("... Something went wrong while getting the url, skipping.")
-					continue
-				html = f.read().decode()
-				# Get all visible text in the document, to detect the language.
-				soup = BeautifulSoup(html, 'html.parser')
-				texts = soup.findAll(text=True)
-				visible_texts = filter(visible, texts)
-				text = "\n\n".join(visible_texts)
-			print("... Detecting language")
-			text_lang = langdetect.detect(text)
+				language = get_language(mention.submission)
+				if language:
+					reply_body = generate_translation(language, info["translate_to"], mention.submission.url)
+					mention.reply(reply_body)
+	if ENABLE_AUTO_TRANSLATE:
+		global before_submission
+		for subreddit in ALLOWED_SUBREDDITS:
+			print("[/r/{}] Retrieving new submissions...".format(subreddit))
+			submissions = r.get_subreddit(subreddit).get_new(sort="New", limit=1000, syntax="cloudsearch",
+					params={"before": before_submission[subreddit]})
+			for submission in submissions:
+				if first:				# Update the 'before'.
+					first = False
+					before_submission[subreddit] = submission.name
+				print("+ New submission: ID={}".format(submission.id))
+				if not commented_before_top_level(submission):
+					language = get_language(submission)
+					if language and language not in AUTO_TRANSLATE_IF_NOT:
+						reply_body = generate_translation(language, DEFAULT_TRANSLATIONS, submission.url)
+						submission.add_comment(reply_body)
+					else:
+						print("... Does not meet translation criteria! Ignoring.")
+				else:
+					print("... Commented before! Ignoring.")
 
-			print("... Posting translations")
-			# Generate reply text for each translation language.
-			replies = []
-
-			for lang, lang_reply in info["translate_to"].items():
-				if lang != text_lang:
-					replies.append(("[{lang_reply} version]("+TRANSLATION_URL+").").format(lang_reply=lang_reply, lang_from=text_lang, lang_to=lang, url=urllib.parse.quote(submission.url)))
-			reply_body = "\n\n".join(replies)
-			mention.reply(reply_body)
-		print("... Deleting mention")
-		mention.delete()
 
 
 print("Starting bot.")
