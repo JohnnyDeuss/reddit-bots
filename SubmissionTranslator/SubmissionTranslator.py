@@ -4,7 +4,7 @@ import urllib.parse
 import praw
 import OAuth2Util
 from bs4 import BeautifulSoup
-import re
+import regex
 import langdetect
 from iso639 import languages
 from time import sleep, time
@@ -32,10 +32,6 @@ ENABLE_AUTO_TRANSLATE = True
 AUTO_TRANSLATE_IF_NOT = ["en", ]
 # Allows the bot to be summoned to a thread with a command (see below).
 ENABLE_SUMMONING = True
-# The comment needed to summon the translator. The default syntax given will
-# summon the bot "+/u/YOUR_USERNAME!". The {} in the below string gets replace
-# by your username. To disable summoning
-SUMMON_SYNTAX = "+/u/{}!"
 # Setting this to True allows you to override the DEFAULT_TRANSLATIONS by adding
 # a list of 2-letter language codes to the summon, e.g. "+/u/YOUR_USERNAME! en de"
 # will translate to German and English instead of to the default translations.
@@ -77,26 +73,25 @@ DEFAULT_TRANSLATIONS = {lang_code: languages.get(part1=lang_code).name for lang_
 ALLOWED_SUBREDDITS = [sr.lower() for sr in ALLOWED_SUBREDDITS]
 
 TRANSLATION_URL = "https://translate.google.com/translate?sl={lang_from}&tl={lang_to}&u={url}"
-COMMENT_REGEX = re.compile("<!--.*-->")
+COMMENT_REGEX = regex.compile("<!--.*-->")
 
 print("Authenticating...")
 r = praw.Reddit("Python:SubmissionTranslator by /u/BitwiseShift")
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
-SUMMON_SYNTAX = SUMMON_SYNTAX.format(r.user.name).lower()
+# The comment needed to summon the translator.
+summon_regex = regex.compile(r"^\s*\+/u/" + r.user.name + r"\s?!(?:(?:[\s\-\+,]+([a-z]{2}))*\s*$)?", regex.IGNORECASE)
 before_mention = None
 before_submission = {sr: None for sr in ALLOWED_SUBREDDITS}
 
 
 def get_lang_codes(body):
-	lang_codes = body[len(SUMMON_SYNTAX):].split()
-	all_two = len(lang_codes) and all([len(code) == 2 for code in lang_codes])
-	return set(lang_codes) if all_two else set()
+	return set([s.lower() for s in summon_regex.match(body).captures(1)])
 
 
 def parse_mention(mention):
 	""" Parse the summon. Check validity and generate translations list. """
-	ret = {"is_valid": mention.body.lower().startswith(SUMMON_SYNTAX)}
+	ret = {"is_valid": not summon_regex.match(mention.body) == None}
 	if not ret["is_valid"]:
 		return ret
 	ret["is_allowed"] = mention.subreddit.display_name.lower() in ALLOWED_SUBREDDITS or not ALLOWED_SUBREDDITS
