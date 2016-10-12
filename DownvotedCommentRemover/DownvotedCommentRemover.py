@@ -9,10 +9,14 @@ from time import sleep
 #
 
 SUBREDDIT = "BitwiseShiftTest"		# Subreddit name, without the /r/ part.
-# Reply given to deleted comments. Set to an empty string '' to not reply at all.
+# Reply given to deleted comments. Set to None to not reply at all.
+# REMOVE_MESSAGE = None
 REMOVE_MESSAGE = "Wow, your score is low!"
+# All comments below the threshold get deleted.
 THRESHOLD = -2
-TIME_BETWEEN_RUNS = 30		# In number of seconds, the minimum is 30 seconds
+# Set this to None to have it run only once
+# TIME_BETWEEN_RUNS = None
+TIME_BETWEEN_RUNS = 30		# In number of seconds, the minimum is 30 seconds.
 
 
 #
@@ -48,12 +52,15 @@ def run_bot():
 	for comment in comments:
 		if comment.score < THRESHOLD and comment.banned_by == None:
 			print("Match found! Comment ID: " + comment.id)
-			comment.reply(REMOVE_MESSAGE)
+			if REMOVE_MESSAGE:
+				comment.reply(REMOVE_MESSAGE)
 			print("Reply to deleted comment succesful!")
 			comment.remove()
 			print("Comment has been deleted")
 	print("End bot run")
 
-while True:
-	run_bot()
-	sleep(max(30, TIME_BETWEEN_RUNS))
+run_bot()
+if TIME_BETWEEN_RUNS:
+	while True:
+		sleep(max(30, TIME_BETWEEN_RUNS))
+		run_bot()
