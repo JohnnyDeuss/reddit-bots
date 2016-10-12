@@ -53,7 +53,7 @@ COUNT_THRESHOLD_COMMENT = 30
 # /r/subreddit_name
 #MODS = ["wmeacham", ]
 #MODS = ["/r/penpals", ]
-MODS = ["BitwiseShift"]
+MODS = ["/r/BitwiseShiftTest"]
 # A definition of all ranks in descending order of prestige. The first value
 # must be the flair CSS class, the second is a function determining whether
 # a user has met the conditions for this flair. I guessed these, change them
@@ -68,6 +68,8 @@ RANKS = OrderedDict([
 	("bronzeemail", lambda row: int(row[1]) >= 3 or int(row[2]) >= 1),
 	("", lambda row: True),	# Catch-all, for people who have not met any requirements yet.
 ])
+# Wether to allow users to verify themselves.
+ALLOW_SELF_VERIFICATION = False
 
 
 #
@@ -131,6 +133,7 @@ def get_verification_thread():
 
 def message_mods(subject, message):
 	""" Lazy loaded send mods a message. """
+	return
 	global MODS
 	for mod in MODS:
 		try:
@@ -173,7 +176,7 @@ def process_comments(thread, prev_comment_time=0):
 			break
 		print("+ Handling new comment. ID={}".format(comment.id))
 		verifications = []	# Stores all verifications of a comment until it is processed.
-		is_user_threshold_exceeded = False
+		error_occurred = False
 		# Start looking for verification count strings.
 		paragraphs = comment.body.splitlines()
 		for paragraph in paragraphs:
@@ -182,25 +185,34 @@ def process_comments(thread, prev_comment_time=0):
 				print("... Verification count string found: "+paragraph)
 				# Add user to added_count if he wasn't in there yet.
 				data = match.groupdict()
+				if not ALLOW_SELF_VERIFICATION and comment.author.name == data["username"]:
+					print("... "+colors.WARNING+"[WARNING]"+colors.ENDC+" Trying to verify himself. Ignoring and messaging mods.")
+					message_mods("Self-verification", """
+					It appears [a user]({}) is attempting to verify themselves.
+					This comment has been ignored and will have to be manually
+					verified.
+					""".format(comment.permalink))
+					error_occurred = True
+					break
 				data["mail_count"] = int(data["mail_count"])
 				data["letter_count"] = int(data["letter_count"])
 				# Check if the COUNT_THRESHOLD_USER hasn't been exceeded.
 				if data["mail_count"] + data["letter_count"] >= COUNT_THRESHOLD_USER:
-					print("... High verification count for a single user. Ignoring and messaging mods.")
+					print("... "+colors.WARNING+"[WARNING]"+colors.ENDC+" High verification count for a single user. Ignoring and messaging mods.")
 					message_mods("Verification count threshold exceeded", """
 					It appears [a comment]({}) is attempting to verify a large
 					email and/or letter count for a single user. This comment
 					has been ignored and will have to be manually verified.
 					""".format(comment.permalink))
-					is_user_threshold_exceeded = True
+					error_occurred = True
 					break
 				else:
 					verifications.append(data)
 		# Only verify the comment threshold id the user threshold wasn't exceeded.
-		if not is_user_threshold_exceeded:
+		if not error_occurred:
 			# Check the comment threshold.
 			if total_verification_count(verifications) > COUNT_THRESHOLD_COMMENT:
-				print("... High verification count for a single user. Ignoring and messaging mods.")
+				print("... "+colors.WARNING+"[WARNING]"+colors.ENDC+" High verification count for a single user. Ignoring and messaging mods.")
 				message_mods("Verification count threshold exceeded", """
 				It appears [a comment]({}) is attempting to verify a large
 				email and/or letter count for a single user. This comment
@@ -248,12 +260,13 @@ def recompute_spreadsheet_data(spreadsheet_data, added_count):
 
 
 def update_flairs(changed_flairs):
+	print("Updating flairs...")
 	after = None
 
 	flairs = []
 	# Update existing flairs.
 	for username, flair_css_class in changed_flairs.items():
-		print("{} {}".format(username, flair_css_class))
+		print("... /u/{} <- {}".format(username, flair_css_class))
 		try:
 			flair = r.get_flair(SUBREDDIT, username)
 		except praw.errors.Forbidden:
@@ -368,7 +381,6 @@ if comment_time1 or comment_time2:
 	print("Computing new counts and flairs...", end="")
 	changed_flairs = recompute_spreadsheet_data(spreadsheet_data, added_count)
 	print(colors.OK+" DONE"+colors.ENDC)
-	print("Updating flairs...")
 	if changed_flairs:
 		try:
 			update_flairs(changed_flairs)
