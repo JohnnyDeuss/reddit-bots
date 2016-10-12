@@ -43,47 +43,13 @@ ALLOW_LANGUAGE_OVERRIDE = True
 # This bot runs in specific subreddits. These subreddits have to be listed below.
 # Only incoming submissions on and mentions coming from these subreddits will be
 # processed.
-ALLOWED_SUBREDDITS = ["BitwiseShiftTest", ]		# Without the /r/ part.
+ALLOWED_SUBREDDITS = ["Habs", ]		# Without the /r/ part.
 
 
 
 #
 # Actual bot
 #
-
-# Read configuration file if one is given.
-if len(argv) == 2:
-	try:
-		with open(argv[1], "r") as f:
-			exec(f.read())
-	except FileNotFoundError as e:
-		print("[ERROR] The config file could not be found.")
-		raise e
-	except Exception as e:
-		print("[ERROR] The config file contains error.")
-		raise e
-elif len(argv) > 2:
-	print("[Error] Correct syntax: {} [config_file]".format(argv[0]))
-	exit()
-
-# Change some of the config to be more usable.
-# Store the language codes with their full name.
-DEFAULT_TRANSLATIONS = {lang_code: languages.get(part1=lang_code).name for lang_code in DEFAULT_TRANSLATIONS}
-# Convert all subreddits to lowercase.
-ALLOWED_SUBREDDITS = [sr.lower() for sr in ALLOWED_SUBREDDITS]
-
-TRANSLATION_URL = "https://translate.google.com/translate?sl={lang_from}&tl={lang_to}&u={url}"
-COMMENT_REGEX = regex.compile("<!--.*-->")
-
-print("Authenticating...")
-r = praw.Reddit("Python:SubmissionTranslator by /u/BitwiseShift")
-o = OAuth2Util.OAuth2Util(r)
-o.refresh(force=True)
-# The comment needed to summon the translator.
-summon_regex = regex.compile(r"^\s*\+/u/" + r.user.name + r"\s?!(?:(?:[\s\-\+,]+([a-z]{2}))*\s*$)?", regex.IGNORECASE)
-before_mention = None
-before_submission = {sr: None for sr in ALLOWED_SUBREDDITS}
-
 
 def get_lang_codes(body):
 	return set([s.lower() for s in summon_regex.match(body).captures(1)])
@@ -136,7 +102,16 @@ def get_language(submission):
 		except:
 			print("... Something went wrong while getting the url, skipping.")
 			return None
-		html = f.read().decode(f.info().get_content_charset()).encode("ascii", errors="ignore")
+		if not f.getheader("content-type"):
+			print("... Web page does not declare what its content is, skipping.")
+			return None
+		if not f.getheader("content-type").lower().startswith("text/html"):
+			print("... Link is not to a translatable page.")
+			return None
+		if not f.info().get_content_charset():
+			print("... The web page did not specify its encoding, skipping.")
+			return None
+		html = f.read().decode(f.info().get_content_charset(), "ignore")
 		# Get all visible text in the document, to detect the language.
 		soup = BeautifulSoup(html, 'html.parser')
 		texts = soup.findAll(text=True)
@@ -166,14 +141,14 @@ def commented_before_top_level(submission):
 		submission.replace_more_comments()
 		comments = list(submission.comments)
 		newLen = len(comments)
-	is_mine = [comment.author.name == r.user.name for comment in comments]
+	is_mine = [comment.author.name == r.user.name for comment in comments if comment.author]
 	return any(is_mine)
 
 
 def run_bot():
 	if ENABLE_SUMMONING:
 		global before_mention
-		mentions = r.get_mentions(sort="New", params={"before": before_mention})
+		mentions = r.get_mentions(sort="New", params={"before": before_mention}, limit=100)
 		first = True
 		for mention in mentions:
 			if first:				# Update the 'before'.
@@ -197,7 +172,7 @@ def run_bot():
 		global before_submission
 		for subreddit in ALLOWED_SUBREDDITS:
 			print("[/r/{}] Retrieving new submissions...".format(subreddit))
-			submissions = r.get_subreddit(subreddit).get_new(sort="New", limit=1000, syntax="cloudsearch",
+			submissions = r.get_subreddit(subreddit).get_new(sort="New", limit=100, syntax="cloudsearch",
 					params={"before": before_submission[subreddit]})
 			for submission in submissions:
 				if first:				# Update the 'before'.
@@ -214,6 +189,39 @@ def run_bot():
 				else:
 					print("... Commented before! Ignoring.")
 
+
+# Read configuration file if one is given.
+if len(argv) == 2:
+	try:
+		with open(argv[1], "r") as f:
+			exec(f.read())
+	except FileNotFoundError as e:
+		print("[ERROR] The config file could not be found.")
+		raise e
+	except Exception as e:
+		print("[ERROR] The config file contains error.")
+		raise e
+elif len(argv) > 2:
+	print("[Error] Correct syntax: {} [config_file]".format(argv[0]))
+	exit()
+
+# Change some of the config to be more usable.
+# Store the language codes with their full name.
+DEFAULT_TRANSLATIONS = {lang_code: languages.get(part1=lang_code).name for lang_code in DEFAULT_TRANSLATIONS}
+# Convert all subreddits to lowercase.
+ALLOWED_SUBREDDITS = [sr.lower() for sr in ALLOWED_SUBREDDITS]
+
+TRANSLATION_URL = "https://translate.google.com/translate?sl={lang_from}&tl={lang_to}&u={url}"
+COMMENT_REGEX = regex.compile("<!--.*-->")
+
+print("Authenticating...")
+r = praw.Reddit("Python:SubmissionTranslator by /u/BitwiseShift")
+o = OAuth2Util.OAuth2Util(r)
+o.refresh(force=True)
+# The comment needed to summon the translator.
+summon_regex = regex.compile(r"^\s*\+/u/" + r.user.name + r"\s?!(?:(?:[\s\-\+,]+([a-z]{2}))*\s*$)?", regex.IGNORECASE)
+before_mention = None
+before_submission = {sr: None for sr in ALLOWED_SUBREDDITS}
 
 
 print("Starting bot.")
