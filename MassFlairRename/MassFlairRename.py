@@ -38,6 +38,7 @@ elif len(argv) > 2:
 	exit()
 
 r = praw.Reddit("Python:MassFlairRename by /u/BitwiseShift")
+r.config.api_request_delay = 1.0
 o = OAuth2Util.OAuth2Util(r)
 o.refresh()
 

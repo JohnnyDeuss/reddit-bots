@@ -334,6 +334,7 @@ print(colors.OK+" DONE"+colors.ENDC)
 
 print("Authenticating with Reddit...", end="")
 r = praw.Reddit("Python:PenpalsVerification by /u/BitwiseShift")
+r.config.api_request_delay = 1.0
 o = OAuth2Util.OAuth2Util(r)
 o.refresh()
 print(colors.OK+" DONE"+colors.ENDC)

@@ -223,6 +223,7 @@ COMMENT_REGEX = regex.compile("<!--.*-->")
 
 print("Authenticating...")
 r = praw.Reddit("Python:SubmissionTranslator by /u/BitwiseShift")
+r.config.api_request_delay = 1.0
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
 # The comment needed to summon the translator.

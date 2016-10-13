@@ -129,6 +129,7 @@ print("About to start sending messages. You will send your message to {} users.\
 input("Press ENTER to continue...")
 print("Authenticating...")
 r = praw.Reddit(UA)
+r.config.api_request_delay = 1.0
 o = OAuth2Util.OAuth2Util(r)
 o.refresh()
 

@@ -48,6 +48,7 @@ elif len(argv) > 2:
 
 print("Authenticating with Reddit...")
 r = praw.Reddit("Python:PowersDateUpdater by /u/BitwiseShift")
+r.config.api_request_delay = 1.0
 o = OAuth2Util.OAuth2Util(r)
 o.refresh()
 

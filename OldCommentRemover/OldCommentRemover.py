@@ -101,6 +101,7 @@ t_to = int((datetime.now() - REMOVE_AFTER).timestamp()) + 8*60*60
 
 print("Authenticating...")
 r = praw.Reddit("Python:OldCommentRemover by /u/BitwiseShift")
+r.config.api_request_delay = 1.0
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
 

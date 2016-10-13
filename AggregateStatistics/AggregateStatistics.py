@@ -35,7 +35,8 @@ elif len(argv) > 2:
 	exit()
 
 print("Authenticating...")
-r = praw.Reddit("Python:StatisticsAggregate by /u/BitwiseShift")
+r = praw.Reddit("Python:AggregateStatistics by /u/BitwiseShift")
+r.config.api_request_delay = 1.0
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)
 
