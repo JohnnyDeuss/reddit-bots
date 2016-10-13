@@ -167,7 +167,10 @@ def run_bot():
 				language = get_language(mention.submission)
 				if language:
 					reply_body = generate_translation(language, info["translate_to"], mention.submission.url)
-					mention.reply(reply_body)
+					try:
+						mention.reply(reply_body)
+					except praw.errors.APIException:
+						print("... Thread too old to comment in. Skipping.")
 	if ENABLE_AUTO_TRANSLATE:
 		global before_submission
 		for subreddit in ALLOWED_SUBREDDITS:
@@ -183,7 +186,11 @@ def run_bot():
 					language = get_language(submission)
 					if language and language not in AUTO_TRANSLATE_IF_NOT:
 						reply_body = generate_translation(language, DEFAULT_TRANSLATIONS, submission.url)
-						submission.add_comment(reply_body)
+						try:
+							submission.add_comment(reply_body)
+						except praw.errors.APIException:
+							print("... Thread too old to comment in. Skipping following submissions.")
+							break
 					else:
 						print("... Does not meet translation criteria! Ignoring.")
 				else:
