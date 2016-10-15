@@ -54,7 +54,12 @@ def run_bot():
 		if comment.score < THRESHOLD and comment.banned_by == None:
 			print("Match found! Comment ID: " + comment.id)
 			if REMOVE_MESSAGE:
-				comment.reply(REMOVE_MESSAGE)
+				try:
+					comment.reply(REMOVE_MESSAGE)
+					print("Reply to deleted comment succesful!")
+				except praw.errors.APIException:
+					print("Thread too old to comment in. Skipping remove message reply.")
+					break
 			print("Reply to deleted comment succesful!")
 			comment.remove()
 			print("Comment has been deleted")
