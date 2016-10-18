@@ -1,7 +1,11 @@
+# OAuth2 authentication info
 oauth.ini
 oauth*.ini
+# Google Sheets API
 client_secret.json
 sheets.googleapis.com-python-*.json
+# File for storing "before" values
+before.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

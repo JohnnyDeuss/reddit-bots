@@ -113,7 +113,7 @@ def get_language(submission):
 			return None
 		html = f.read().decode(f.info().get_content_charset(), "ignore")
 		# Get all visible text in the document, to detect the language.
-		soup = BeautifulSoup(html, 'html.parser')
+		soup = BeautifulSoup(html, "html.parser")
 		texts = soup.findAll(text=True)
 		visible_texts = filter(visible, texts)
 		text = "\n\n".join(visible_texts)

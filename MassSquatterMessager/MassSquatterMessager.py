@@ -71,7 +71,7 @@ def get_moderated_subreddits(username):
 		return None
 
 	html = f.read().decode(f.info().get_content_charset()).encode("ascii", errors="ignore")
-	soup = BeautifulSoup(html, 'html.parser')
+	soup = BeautifulSoup(html, "html.parser")
 	side_mod = soup.find("ul", {"id": "side-mod-list"})
 	return [] if side_mod == None else [tag.text for tag in side_mod.find_all("a")]
 
