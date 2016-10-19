@@ -4,8 +4,9 @@ oauth*.ini
 # Google Sheets API
 client_secret.json
 sheets.googleapis.com-python-*.json
-# File for storing "before" values
+# File for storing "before"/persistence values
 before.json
+persistence.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -27,7 +27,7 @@ ALLOWED_SUBREDDITS = [
 PERSISTENCE_FILE = "before.json"
 # Text to prefix and suffix to the bot's comment.
 COMMENT_PREFIX = "***Twitter transcript***\n*****\n"
-COMMENT_SUFFIX = ("\n*****\n^^I'm ^^a ^^bot. ^^For ^^questions ^^or ^^comments, ^^contact ^^/u/{}!\n"
+COMMENT_SUFFIX = ("\n*****\n^^I'm ^^a ^^bot. ^^For ^^questions ^^or ^^comments, ^^contact ^^/u/{}!"
 		"^^[Source](https://github.com/JohnnyDeuss/reddit-bots/tree/master/TwitterTranscriber).").format(USERNAME)
 
 
@@ -56,7 +56,6 @@ def load_persistence_data():
 	if os.path.isfile(PERSISTENCE_FILE):
 		with open(PERSISTENCE_FILE, "r") as f:
 			r.update(json.load(f))
-			pass
 	return r
 
 
