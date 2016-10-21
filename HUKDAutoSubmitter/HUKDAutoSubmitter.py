@@ -84,7 +84,7 @@ posted_before = load_persistence_data()
 atexit.register(save_persistence_data)
 
 print("Authenticating...")
-r = praw.Reddit("Python:TwitterTranscriber by /u/BitwiseShift")
+r = praw.Reddit("Python:HUKDAutoSubmitter by /u/BitwiseShift")
 r.config.api_request_delay = 1.0
 o = OAuth2Util.OAuth2Util(r)
 o.refresh(force=True)

@@ -7,8 +7,7 @@ import httplib2
 # Google API
 from apiclient import discovery
 from apiclient.errors import HttpError
-from oauth2client import client
-from oauth2client import tools
+from oauth2client import client, tools
 from oauth2client.file import Storage
 
 # Reddit API
@@ -304,31 +303,32 @@ def update_flairs(changed_flairs):
 
 
 # Google Sheets API
-SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
-CLIENT_SECRET_FILE = 'client_secret.json'
-APPLICATION_NAME = 'Google Sheets API Python Quickstart'
+SCOPES = "https://www.googleapis.com/auth/spreadsheets"
+CLIENT_SECRET_FILE = "client_secret.json"
+APPLICATION_NAME = "Google Sheets API Python Quickstart"
 DATA_RANGE = FLAIR_SHEET+"!A:D"
 # Global variables
 SUBREDDIT = "penpals"
 # Regular expressing expressing the syntax of the command.
-RE_VERIFICATION_SYNTAX = re.compile(r"\A\s*"						# Any leading whitespace.
-									# Reddit username, based on the Reddit source code.
-									# First / is optional, as people seemed to forget it occasionally.
-									# Entire /u/ part can be left out as well.
-									r"(/?u/)?(?P<username>[\w\-]+)"
-									r"[\s,_\-+]+"					# Delimiters.
-									r"(?P<mail_count>[0-9]+)"
-									r"[\s,_\-+]+"					# Delimiters.
-									r"(?P<letter_count>[0-9+]+)"
-									r"\s*\Z",						# Any trailing whitespace.
-									re.UNICODE)
+RE_VERIFICATION_SYNTAX = re.compile(
+		r"\A\s*"						# Any leading whitespace.
+		# Reddit username, based on the Reddit source code.
+		# First / is optional, as people seemed to forget it occasionally.
+		# Entire /u/ part can be left out as well.
+		r"(/?u/)?(?P<username>[\w\-]+)"
+		r"[\s,_\-+]+"					# Delimiters.
+		r"(?P<mail_count>[0-9]+)"
+		r"[\s,_\-+]+"					# Delimiters.
+		r"(?P<letter_count>[0-9+]+)"
+		r"\s*\Z",						# Any trailing whitespace.
+		re.UNICODE)
 
 
-print('Authenticating with Docs API...', end="")
+print("Authenticating with Docs API...", end="")
 credentials = get_credentials()
 http = credentials.authorize(httplib2.Http())
-discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?version=v4')
-service = discovery.build('sheets', 'v4', http=http,
+discoveryUrl = ("https://sheets.googleapis.com/$discovery/rest?version=v4")
+service = discovery.build("sheets", "v4", http=http,
  						  discoveryServiceUrl=discoveryUrl)
 print(colors.OK+" DONE"+colors.ENDC)
 
