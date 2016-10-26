@@ -1,5 +1,4 @@
 # MassFlairRename
-
 Rename user flair CSS class names on mass.
 
 Requested by [here](https://www.reddit.com/r/RequestABot/comments/53vz7g/updating_thousands_of_css_class_flairs/)

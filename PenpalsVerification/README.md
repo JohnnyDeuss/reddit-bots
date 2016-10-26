@@ -1,5 +1,4 @@
 # PenpalsVerification
-
 Bot to automate the verification threads of [/r/penpals](https://www.reddit.com/r/penpals).
 On top of accessing Reddit, it also communicates with Google sheets, where a
 spreadsheet is stored with all verification information. Comments in the

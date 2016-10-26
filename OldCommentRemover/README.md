@@ -1,5 +1,4 @@
 # OldCommentRemover
-
 Delete all comments from a subreddit that are older than a given period. You
 need to be a moderator of the given subreddit to run this bot. This bot has to
 be scheduled.

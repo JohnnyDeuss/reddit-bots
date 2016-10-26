@@ -1,5 +1,4 @@
 # DownvotedCommentRemover
-
 Removes all comments with a score below a given threshold after replying to them.
 This currently is only applicable to moderators removing downvoted comments from
 their subreddits. Want one that removes your own downvoted comments? Contact me.

@@ -1,5 +1,4 @@
 # PowersDateUpdater
-
 Bot to automate the date changes for certain powers subreddits, e.g.
 [/r/DawnPowers](https://www.reddit.com/r/DawnPowers). The date is calculated
 based on the previous in-game date, which is given in the sidebar.

@@ -1,5 +1,4 @@
 # MassSquatterMessager
-
 This script will investigate a mass squater's subreddits and figure out which of them are
 username subreddits. Every username subreddit will be verified to make sure that the user it is
 named after isn't also a moderator of it. Every user who's username subreddit is being squated

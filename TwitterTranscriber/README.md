@@ -1,5 +1,4 @@
 # TwitterTranscriber
-
 Transcribe Twitter links mentioned in a submission body. This script will only
 run within whitelisted subreddits. The script keeps track of which submission it
 processed last within each subreddit and will not load older submissions again,

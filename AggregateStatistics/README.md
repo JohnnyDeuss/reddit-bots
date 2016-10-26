@@ -1,5 +1,4 @@
 # AggregateStatistics
-
 This will aggregate flair statistics over the newest submissions returned by a
 search. The generated statistics are total/avg upvotes, estimated total/avg
 downvotes, estimated total/avg votes and average upvote percentage. The bot can

@@ -1,5 +1,4 @@
 # SubmissionTranslator
-
 This bot can be summoned to translate a submission. It does not use Google's
 autodetection to determine the language of the document, as you'd need an API
 key for that, which is to difficult for laymen and isn't free. It does use
@@ -10,7 +9,6 @@ Requested [here](https://www.reddit.com/r/RequestABot/comments/555gew/a_translat
 by [/u/frost_biten](https://www.reddit.com/user/frost_biten).
 
 ## How to summon it
-
 The SubmissionTranslator has two different approaches to translating. It can
 automatically post translations if the submission's language is detected to not
 be one of the preferred languages (usually English). The second way it can post
@@ -23,7 +21,6 @@ translate to English, French, German and Dutch. Each of these methods can be
 enabled/disabled in the configuration.
 
 ## Installation instructions
-
 Follow the instructions [here](https://github.com/JohnnyDeuss/reddit-bots#reddit-bots).
 This script uses the `langdetect` module to detect languages. Install it by
 running `pip install langdetect` in the command prompt. It also uses the
