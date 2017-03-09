@@ -263,6 +263,7 @@ def update_flairs(changed_flairs):
 	after = None
 
 	flairs = []
+	unknowns = []
 	# Update existing flairs.
 	for username, flair_css_class in changed_flairs.items():
 		print("... /u/{} <- {}".format(username, flair_css_class))
