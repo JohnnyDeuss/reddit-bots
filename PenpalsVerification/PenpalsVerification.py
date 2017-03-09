@@ -278,13 +278,13 @@ def update_flairs(changed_flairs):
 			continue
 		# The empty flair texts (None) need to be converted to empty strings.
 		if flair["flair_css_class"] == None:
-			flair["flair_text"] = ""
+			flair["flair_css_class"] = ""
 		if flair["flair_text"] == None:
 			flair["flair_text"] = ""
 		# Validate the flair classes with those defined.
 		if flair["flair_css_class"] not in RANKS and flair["flair_css_class"] not in unknowns:
 			unknowns.append(flair_css_class)
-			print(colors.ERROR+"[ERROR]"+colors.ENDC+' Encountered an unknown CSS flair class "{}".'.format(flair_css_class))
+			print(colors.ERROR+"[ERROR]"+colors.ENDC+' Encountered an unknown CSS flair class "{}".'.format(flair["flair_css_class"]))
 		print("... Queuing flair {} for /u/{}".format(flair_css_class, flair["user"]))
 		flair["flair_css_class"] = flair_css_class
 		flairs.append(flair)
